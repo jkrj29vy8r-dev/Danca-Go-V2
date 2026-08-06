@@ -36,7 +36,17 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
+    // Web fonts and the lazily-mounted canvas can change document height after
+    // triggers are measured, which would leave scrubbed tweens reading stale
+    // positions. Re-measure once everything has settled, and on resize.
+    const refresh = () => ScrollTrigger.refresh();
+    const settleTimer = window.setTimeout(refresh, 900);
+    document.fonts?.ready.then(refresh).catch(() => {});
+    window.addEventListener("resize", refresh);
+
     return () => {
+      window.clearTimeout(settleTimer);
+      window.removeEventListener("resize", refresh);
       gsap.ticker.remove(raf);
       lenis.destroy();
     };

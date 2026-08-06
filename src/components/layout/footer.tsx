@@ -81,7 +81,7 @@ export function Footer() {
 
         <div className="mt-20 flex flex-col gap-4 border-t border-hairline pt-8 text-xs text-ink-dim sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {site.legalName}. Toate drepturile rezervate.
+            © {year} {site.legalName} · Toate drepturile rezervate.
           </p>
           <p className="flex items-center gap-2">
             <span className="text-accent tabular-nums">{site.rating.score}</span>

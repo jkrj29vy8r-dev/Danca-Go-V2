@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { Check } from "lucide-react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { ButtonLink } from "@/components/ui/button";
 import { fleet } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -12,8 +13,12 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 /**
  * Sticky scroll showcase: the section is `fleet.length` viewports tall and the
  * inner panel is pinned, so scrolling swaps the active vehicle in place. It's
- * the Apple product-page device — it gives each vehicle the full screen without
+ * the Apple product-page device — each vehicle gets the full screen without
  * making the user click through a carousel.
+ *
+ * Framer's `useScroll` is used rather than GSAP pinning here because the panel
+ * is position:sticky, which the browser handles natively — no pin-spacer, no
+ * layout thrash, and it survives resize without a refresh.
  */
 export function FleetSection() {
   const container = useRef<HTMLElement>(null);
@@ -23,6 +28,10 @@ export function FleetSection() {
     target: container,
     offset: ["start start", "end end"],
   });
+
+  // The backdrop drifts slowly across the whole section, giving the pinned
+  // panel a sense of travel that the swapping content alone doesn't provide.
+  const glowX = useTransform(scrollYProgress, [0, 1], ["62%", "38%"]);
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     const index = Math.min(fleet.length - 1, Math.floor(progress * fleet.length));
@@ -39,12 +48,13 @@ export function FleetSection() {
       aria-label="Flota Danca Go"
     >
       <div className="sticky top-0 flex h-dvh flex-col justify-center overflow-hidden">
-        <div
+        <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
-            background:
-              "radial-gradient(50% 40% at 70% 50%, rgb(200 164 104 / 0.07), transparent 70%)",
+            background: "radial-gradient(45% 40% at var(--gx) 50%, rgb(200 164 104 / 0.09), transparent 70%)",
+            // @ts-expect-error — custom property consumed by the gradient above
+            "--gx": glowX,
           }}
         />
 
@@ -56,10 +66,10 @@ export function FleetSection() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={vehicle.slug}
-                initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+                initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -16, filter: "blur(6px)" }}
-                transition={{ duration: 0.55, ease: EASE }}
+                exit={{ opacity: 0, y: -18, filter: "blur(8px)" }}
+                transition={{ duration: 0.7, ease: EASE }}
               >
                 <p className="mt-6 text-sm tabular-nums text-accent">{vehicle.seats}</p>
                 <h2 className="mt-3 text-headline text-gradient">{vehicle.headline}</h2>
@@ -96,26 +106,28 @@ export function FleetSection() {
                 </li>
               ))}
             </ol>
+
+            <ButtonLink href="/flota" variant="secondary" size="md" className="group mt-10">
+              Vezi toată flota
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </ButtonLink>
           </div>
 
           {/* --- Spec column --- */}
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline">
-            {vehicle.specs.map((spec) => (
-              <AnimatePresence mode="wait" key={spec.label}>
-                <motion.div
-                  key={`${vehicle.slug}-${spec.label}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className="flex flex-col justify-between gap-8 bg-surface p-7 md:p-9"
-                >
-                  <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
-                    {spec.label}
-                  </span>
-                  <span className="text-title font-medium text-ink">{spec.value}</span>
-                </motion.div>
-              </AnimatePresence>
+            {vehicle.specs.map((spec, index) => (
+              <motion.div
+                key={`${vehicle.slug}-${spec.label}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: EASE, delay: 0.06 * index }}
+                className="flex flex-col justify-between gap-8 bg-surface p-7 md:p-9"
+              >
+                <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                  {spec.label}
+                </span>
+                <span className="text-title font-medium text-ink">{spec.value}</span>
+              </motion.div>
             ))}
           </div>
         </div>

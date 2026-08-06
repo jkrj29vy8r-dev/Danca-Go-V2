@@ -251,6 +251,46 @@ export const stats = [
   { value: "100%", suffix: "", label: "licențiat ARR & ISO" },
 ];
 
+/** Rating distribution behind the 4.63 average. */
+export const ratingBreakdown = [
+  { stars: 5, share: 78 },
+  { stars: 4, share: 14 },
+  { stars: 3, share: 5 },
+  { stars: 2, share: 2 },
+  { stars: 1, share: 1 },
+];
+
+export const testimonials = [
+  {
+    quote:
+      "Am prins cursa de noapte spre Otopeni după un tur de 12 ore. Autocar curat, șofer calm, am ajuns cu 10 minute mai devreme. Exact ce îți dorești când ai un avion de prins.",
+    author: "Andrei M.",
+    context: "Bacău → Otopeni",
+    rating: 5,
+  },
+  {
+    quote:
+      "Călătoresc lunar pe ruta București — Roman. În doi ani, o singură întârziere, și aia anunțată din timp. Nu am ce reproșa.",
+    author: "Elena P.",
+    context: "București → Roman",
+    rating: 5,
+  },
+  {
+    quote:
+      "Am închiriat un autocar de 57 de locuri pentru echipa noastră. Oferta a venit în aceeași zi, contractul fără surprize, iar șoferul ne-a așteptat fără nicio grabă.",
+    author: "Cristina D.",
+    context: "Închiriere corporate",
+    rating: 5,
+  },
+  {
+    quote:
+      "Prețul afișat online a fost exact prețul plătit la urcare. Pare un lucru mic, dar în transportul de persoane e o raritate.",
+    author: "Vlad I.",
+    context: "Constanța → Bacău",
+    rating: 4,
+  },
+];
+
 export const promises = [
   {
     title: "Plecăm la fix",

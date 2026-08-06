@@ -1,14 +1,16 @@
-import { Star } from "lucide-react";
+import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
 import { SearchWidget } from "./search-widget";
+import { ButtonLink } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
- * Hero composition, top to bottom: type → 3D coach → search widget.
+ * Hero composition, top to bottom: type → 3D coach → search dock.
  *
- * The coach lives in its own flex-1 band rather than behind the text, so it can
- * never collide with the headline on short viewports.
+ * The coach lives in its own flex-1 band rather than behind the text, so it
+ * can never collide with the headline on short viewports, and the dock reads
+ * as the surface the vehicle is standing on.
  *
  * This is a Server Component on purpose. Every entrance here is a CSS
  * animation, which means the headline — the LCP element — paints with the HTML
@@ -16,7 +18,7 @@ import { cn } from "@/lib/utils";
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-dvh flex-col overflow-hidden pt-28 pb-10 md:pt-32">
+    <section className="relative flex min-h-dvh flex-col overflow-hidden pt-28 md:pt-32">
       <Backdrop />
 
       <div className="container-page relative z-20">
@@ -49,22 +51,69 @@ export function Hero() {
           Curse zilnice între Otopeni, București, Moldova și litoral. Autocare
           moderne, plecări la fix, bilet rezervat în mai puțin de un minut.
         </p>
+
+        <div
+          className="anim-rise mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          style={{ animationDelay: "0.85s" }}
+        >
+          <ButtonLink
+            href="/rezervare"
+            variant="primary"
+            size="lg"
+            className="group w-full sm:w-auto"
+          >
+            Rezervă bilet
+            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+          </ButtonLink>
+
+          <ButtonLink
+            href="/inchirieri"
+            variant="secondary"
+            size="lg"
+            className="w-full sm:w-auto"
+          >
+            <Bus className="size-4" aria-hidden />
+            Închiriază autocar
+          </ButtonLink>
+        </div>
       </div>
 
-      <div className="relative z-10 min-h-[220px] flex-1 md:min-h-[300px]">
+      {/* flex-1 with a modest floor: the band absorbs whatever height is left
+          after the type and dock, so the dock stays above the fold at 900px
+          and the coach simply gets larger on taller screens. */}
+      <div className="relative z-10 min-h-[170px] flex-1 md:min-h-[210px]">
         <CoachStage className="absolute inset-0" />
       </div>
 
-      {/* The one thing that must be reachable without any scrolling. */}
-      <div
-        className="anim-rise container-page relative z-20 pt-8"
-        style={{ animationDelay: "0.95s" }}
-      >
-        <div className="mx-auto max-w-5xl">
-          <SearchWidget />
+      <SearchDock />
+    </section>
+  );
+}
+
+/**
+ * The search widget is docked to the base of the hero as a full-bleed bar
+ * rather than a card floating over the artwork: a single hairline spans the
+ * viewport, the coach sits on it, and the fields are divided by rules instead
+ * of being boxed. That reads as part of the page architecture, not an overlay
+ * that happened to land there.
+ */
+function SearchDock() {
+  return (
+    <div
+      className="anim-rise relative z-20 border-t border-hairline bg-void/55 backdrop-blur-2xl"
+      style={{ animationDelay: "0.95s" }}
+    >
+      <div className="container-page">
+        <div className="flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:gap-8 lg:py-3">
+          <span className="hidden shrink-0 items-center gap-2.5 text-eyebrow uppercase text-ink-dim lg:flex">
+            <span aria-hidden className="size-1 rounded-full bg-accent" />
+            Caută o cursă
+          </span>
+
+          <SearchWidget variant="dock" className="flex-1" />
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -87,16 +136,21 @@ function WordReveal({
   return (
     <span className={cn("inline-block", className)}>
       {words.map((word, index) => (
+        // The gap between words is a margin on the mask, not a space inside it:
+        // whitespace at the end of an inline-block gets collapsed away, which
+        // silently runs the words together.
         <span
           key={`${word}-${index}`}
-          className="inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]"
+          className={cn(
+            "inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]",
+            index < words.length - 1 && "mr-[0.22em]",
+          )}
         >
           <span
             className="anim-word"
             style={{ animationDelay: `${delay + index * 0.055}s` }}
           >
             {word}
-            {index < words.length - 1 ? " " : ""}
           </span>
         </span>
       ))}

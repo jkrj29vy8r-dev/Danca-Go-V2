@@ -1,11 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
-import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { Reveal } from "@/components/motion/reveal";
 import { featuredRoutes } from "@/lib/site";
 import { formatDuration, formatPrice } from "@/lib/utils";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function RoutesSection() {
   return (
@@ -30,12 +35,38 @@ export function RoutesSection() {
         </Reveal>
       </div>
 
-      <RevealGroup className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/*
+        Cards enter on a long, low-amplitude stagger. The slowness is the point:
+        0.055s between cards over a 1.1s curve reads as considered, where the
+        0.02s/0.4s most sites use reads as a page finishing loading.
+      */}
+      <motion.ul
+        className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-8% 0px -12% 0px" }}
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.055 } },
+        }}
+      >
         {featuredRoutes.map((route) => (
-          <RevealItem key={route.slug}>
-            <Card className="h-full">
+          <motion.li
+            key={route.slug}
+            variants={{
+              hidden: { opacity: 0, y: 40, scale: 0.97, filter: "blur(8px)" },
+              visible: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                filter: "blur(0px)",
+                transition: { duration: 1.1, ease: EASE },
+              },
+            }}
+          >
+            <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
               <Link
-                href={`/rute/${route.slug}`}
+                href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
                 className="flex h-full flex-col justify-between gap-10 p-7"
               >
                 <div>
@@ -72,9 +103,9 @@ export function RoutesSection() {
                 </div>
               </Link>
             </Card>
-          </RevealItem>
+          </motion.li>
         ))}
-      </RevealGroup>
+      </motion.ul>
     </section>
   );
 }

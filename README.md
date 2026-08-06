@@ -56,7 +56,7 @@ src/
 ├── components/
 │   ├── ui/                     Design-system primitives (Button, Card, Eyebrow)
 │   ├── layout/                 Navbar, Footer, PageHeader, Logo
-│   ├── motion/                 Lenis + GSAP provider, scroll reveal primitives
+│   ├── motion/                 Lenis + GSAP provider, reveal + scroll effects
 │   ├── three/                  3D coach, studio rig, performance gate
 │   ├── home/                   Homepage sections
 │   ├── booking/ rentals/       Forms
@@ -94,10 +94,40 @@ vector silhouette. First Load JS for the homepage stays at ~170 kB.
 canvas aspect ratio so the coach stays fully in frame from a wide desktop band
 to a narrow phone, instead of relying on hardcoded positions.
 
+**Paint reads as metal because of what it reflects.** The body uses a clearcoat
+material over a non-black basecoat, and the environment is built from long
+horizontal `<Lightformer>` strips — the same trick as real automotive
+photography, where a softbox strip is dragged down the flank. Clearcoat with
+nothing to reflect just looks like plastic.
+
+**A reflective floor was built and cut.** `MeshReflectorMaterial` read as a
+hard-edged grey stage rather than wet asphalt, and its per-frame blur was
+measurably the most expensive thing in the scene — screenshot capture went from
+seconds to timing out. `ContactShadows` grounds the vehicle for a fraction of
+the cost.
+
 **Hero entrances are CSS, not Framer Motion.** The headline is the LCP element;
 driving it with JS would ship it as `opacity: 0` in the SSR HTML and delay
 paint until hydration. Below the fold, `Reveal`/`RevealGroup` use Framer Motion
 `whileInView` where that trade-off doesn't apply.
+
+**Two animation systems, split by job.** Framer Motion owns discrete entrances
+(a card fades in once and is done). GSAP ScrollTrigger owns anything that must
+stay *linked* to scroll position across distance — parallax, scale-through,
+line-by-line reveals. ScrollTrigger reads from Lenis via the shared ticker, so
+the two never fight over scroll position. Scrubbed tweens keep a high opacity
+floor: a jump-scroll can leave a scrub mid-state, and no conversion CTA should
+ever be sitting at 15% opacity when the user lands on it.
+
+**Timing is the brand.** Entrances run on a single `cubic-bezier(0.16, 1, 0.3,
+1)` at ~1.1s with 0.055s stagger. The slowness is deliberate — the 0.3s/0.02s
+defaults most sites use read as a page finishing loading, not as design.
+
+**The search widget is docked, not floating.** In the hero it renders as a
+full-bleed bar with fields divided by hairlines, so it reads as page
+architecture the coach is standing on rather than a card that happened to land
+over the artwork. The same component renders as a raised card on `/rezervare`
+via a `variant` prop.
 
 **Seat inventory is enforced in Postgres.** `book_trip()` locks the trip row,
 validates availability, decrements inventory and writes the booking in one

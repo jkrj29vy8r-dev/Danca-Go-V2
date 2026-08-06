@@ -28,46 +28,62 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
 
   // Materials are memoised so hover/scroll re-renders never rebuild shaders.
   const materials = useMemo(() => {
-    // Deliberately lighter than the page background: on #050505 a true-black
-    // vehicle disappears. The graphite reads as black but keeps its edges.
+    /**
+     * Automotive paint, not plastic. Three things sell it:
+     *  - a dark base that is *not* pure black, so the form stays readable
+     *  - low roughness under a full clearcoat layer, which gives the two-lobe
+     *    highlight real car paint has (sharp coat + soft basecoat)
+     *  - high envMapIntensity so the lightformer strips wrap around the body
+     */
     const paint = new THREE.MeshPhysicalMaterial({
-      color: "#1c1c22",
-      metalness: 0.5,
-      roughness: 0.26,
+      color: "#191920",
+      metalness: 0.62,
+      roughness: 0.22,
       clearcoat: 1,
-      clearcoatRoughness: 0.1,
-      envMapIntensity: 2.2,
-    });
-
-    const glass = new THREE.MeshPhysicalMaterial({
-      color: "#04060b",
-      metalness: 0.95,
-      roughness: 0.06,
-      clearcoat: 1,
-      clearcoatRoughness: 0.04,
+      clearcoatRoughness: 0.06,
       envMapIntensity: 2.6,
+      sheen: 0.3,
+      sheenRoughness: 0.6,
+      sheenColor: new THREE.Color("#2a2a36"),
     });
 
+    // Deep, near-mirror glazing with a faint blue cast.
+    const glass = new THREE.MeshPhysicalMaterial({
+      color: "#05070d",
+      metalness: 1,
+      roughness: 0.035,
+      clearcoat: 1,
+      clearcoatRoughness: 0.02,
+      envMapIntensity: 3.4,
+    });
+
+    // Polished brass, not flat yellow: high metalness, low roughness, and the
+    // colour carried by reflection rather than emission.
     const gold = new THREE.MeshStandardMaterial({
       color: "#c8a468",
       metalness: 1,
-      roughness: 0.22,
-      envMapIntensity: 2,
-      emissive: new THREE.Color("#c8a468"),
-      emissiveIntensity: 0.12,
+      roughness: 0.16,
+      envMapIntensity: 3,
+    });
+
+    const trim = new THREE.MeshStandardMaterial({
+      color: "#0c0c10",
+      metalness: 0.7,
+      roughness: 0.42,
+      envMapIntensity: 1.2,
     });
 
     const rubber = new THREE.MeshStandardMaterial({
-      color: "#0a0a0c",
-      metalness: 0.1,
-      roughness: 0.85,
+      color: "#0b0b0d",
+      metalness: 0.05,
+      roughness: 0.92,
     });
 
     const hub = new THREE.MeshStandardMaterial({
-      color: "#8f8f96",
+      color: "#9aa0a8",
       metalness: 1,
-      roughness: 0.28,
-      envMapIntensity: 1.6,
+      roughness: 0.22,
+      envMapIntensity: 2.2,
     });
 
     // Tone-mapped and restrained: unmapped emissives at high intensity clip to
@@ -76,18 +92,18 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
       color: "#dce6f5",
       emissive: new THREE.Color("#cfe0ff"),
       emissiveIntensity: 1.1,
-      roughness: 0.25,
-      metalness: 0.2,
+      roughness: 0.2,
+      metalness: 0.3,
     });
 
     const taillight = new THREE.MeshStandardMaterial({
-      color: "#8f1a1a",
+      color: "#7d1717",
       emissive: new THREE.Color("#e02424"),
-      emissiveIntensity: 0.9,
+      emissiveIntensity: 0.85,
       roughness: 0.3,
     });
 
-    return { paint, glass, gold, rubber, hub, headlight, taillight };
+    return { paint, glass, gold, trim, rubber, hub, headlight, taillight };
   }, []);
 
   useFrame((state, delta) => {
@@ -100,7 +116,7 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
     // Barely-there float so the coach never feels like a static screenshot.
     if (group.current) {
       const t = state.clock.elapsedTime;
-      group.current.position.y = Math.sin(t * 0.6) * 0.035;
+      group.current.position.y = Math.sin(t * 0.55) * 0.04;
     }
   });
 
@@ -112,6 +128,9 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
     [BODY_LENGTH / 2 - 1.25, WHEEL_RADIUS, BODY_WIDTH / 2 - 0.12],
     [BODY_LENGTH / 2 - 1.25, WHEEL_RADIUS, -BODY_WIDTH / 2 + 0.12],
   ];
+
+  // Window pillars, drawn as thin dark ribs over the glazing band.
+  const pillars = Array.from({ length: 7 }, (_, index) => -4.6 + index * 1.35);
 
   return (
     <group ref={group} dispose={null}>
@@ -132,7 +151,7 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
         radius={0.12}
         smoothness={4}
         position={[0, 0.66, 0]}
-        material={materials.paint}
+        material={materials.trim}
         castShadow
       />
 
@@ -144,6 +163,15 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
         position={[-0.15, BODY_HEIGHT / 2 + 1.35, 0]}
         material={materials.glass}
       />
+
+      {/* --- Window pillars --- */}
+      {pillars.map((x) =>
+        [BODY_WIDTH / 2 + 0.03, -BODY_WIDTH / 2 - 0.03].map((z) => (
+          <mesh key={`${x}-${z}`} position={[x, BODY_HEIGHT / 2 + 1.35, z]} material={materials.trim}>
+            <boxGeometry args={[0.07, 1.16, 0.02]} />
+          </mesh>
+        )),
+      )}
 
       {/* --- Windscreen: raked, wraps the front --- */}
       <RoundedBox
@@ -165,13 +193,13 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
       />
 
       {/* --- Gold beltline: the single brand accent on the vehicle --- */}
-      {[BODY_WIDTH / 2 + 0.005, -BODY_WIDTH / 2 - 0.005].map((z) => (
+      {[BODY_WIDTH / 2 + 0.008, -BODY_WIDTH / 2 - 0.008].map((z) => (
         <mesh
           key={z}
           position={[-0.15, BODY_HEIGHT / 2 + 0.66, z]}
           material={materials.gold}
         >
-          <boxGeometry args={[BODY_LENGTH - 1.4, 0.045, 0.012]} />
+          <boxGeometry args={[BODY_LENGTH - 1.4, 0.05, 0.014]} />
         </mesh>
       ))}
 
@@ -181,7 +209,7 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
         radius={0.09}
         smoothness={3}
         position={[-1.6, BODY_HEIGHT + 0.72, 0]}
-        material={materials.paint}
+        material={materials.trim}
       />
 
       {/* --- Lighting --- */}
@@ -203,7 +231,7 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
           rotation={[0, Math.PI / 2, 0]}
           material={materials.taillight}
         >
-          <capsuleGeometry args={[0.055, 0.34, 4, 12]} />
+          <capsuleGeometry args={[0.05, 0.3, 4, 12]} />
         </mesh>
       ))}
 
@@ -212,7 +240,7 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
         <mesh
           key={`mirror-${z}`}
           position={[BODY_LENGTH / 2 - 1.05, BODY_HEIGHT / 2 + 1.85, z]}
-          material={materials.paint}
+          material={materials.trim}
         >
           <boxGeometry args={[0.06, 0.5, 0.14]} />
         </mesh>
