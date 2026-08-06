@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { VehiclePhoto } from "./vehicle-photo";
+import { cn } from "@/lib/utils";
 import type { FleetClass } from "@/lib/site";
 
 /**
@@ -26,7 +27,17 @@ export function VehicleGallery({
       {gallery.length > 0 && (
         // A lone final tile spans the row rather than leaving a hole, so the
         // gallery stays balanced at any photo count.
-        <ul className="grid grid-cols-2 gap-3 [&>li:last-child:nth-child(odd)]:col-span-2">
+        <ul
+          className={cn(
+            "grid gap-3",
+            // Three across once there are enough photos to make a 2-up grid
+            // taller than the copy beside it; the odd-tile rule then fills
+            // whatever gap the last row leaves.
+            gallery.length > 4
+              ? "grid-cols-2 xl:grid-cols-3 [&>li:last-child:nth-child(odd)]:col-span-2 xl:[&>li:last-child:nth-child(odd)]:col-span-1"
+              : "grid-cols-2 [&>li:last-child:nth-child(odd)]:col-span-2",
+          )}
+        >
           {gallery.map((shot) => (
             <li key={shot.src}>
               {/* 16:10 matches the processed source crop exactly. A different
@@ -37,7 +48,7 @@ export function VehicleGallery({
                   src={shot.src}
                   alt={shot.alt}
                   fill
-                  sizes="(min-width: 1024px) 25vw, 45vw"
+                  sizes="(min-width: 1280px) 17vw, (min-width: 1024px) 25vw, 45vw"
                   className="object-cover transition-transform duration-700 ease-[var(--ease-out-expo)] hover:scale-[1.04]"
                 />
                 {/* Same tonal wash as the primary photo, so a bright daylight

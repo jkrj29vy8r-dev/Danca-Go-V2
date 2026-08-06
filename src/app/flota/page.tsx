@@ -24,7 +24,9 @@ export default function FleetPage() {
       <div className="container-page flex flex-col gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline pb-0">
         {fleet.map((vehicle, vehicleIndex) => (
           <Reveal key={vehicle.slug}>
-            <article className="grid gap-10 bg-surface p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:p-14">
+            {/* items-center: the media column is much taller than the copy once the
+                gallery is in, so left-aligned text left a large void beneath it. */}
+            <article className="grid gap-10 bg-surface p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:items-center md:p-14">
               <div>
                 <p className="text-sm tabular-nums text-accent">{vehicle.seats}</p>
                 <h2 className="mt-3 text-headline text-gradient">{vehicle.name}</h2>
