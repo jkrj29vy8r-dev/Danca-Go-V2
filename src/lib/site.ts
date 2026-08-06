@@ -296,6 +296,7 @@ export const fleet: FleetClass[] = [
       { src: "/fleet/sprinter-aeroport.jpg", alt: "Microbuz Sprinter în așteptare la terminalul aeroportului" },
       { src: "/fleet/sprinter-pair.jpg", alt: "Două microbuze Sprinter din flota Danca Go, parcate unul lângă altul" },
       { src: "/fleet/sprinter-city.jpg", alt: "Microbuz Sprinter negru, folosit pentru transfer aeroport" },
+      { src: "/fleet/sprinter-red.jpg", alt: "Microbuz Sprinter roșu, în autogară, pregătit de plecare" },
     ],
   },
   {
@@ -315,6 +316,19 @@ export const fleet: FleetClass[] = [
     image: "/fleet/vito.jpg",
   },
 ];
+
+/**
+ * The fleet page lists representative vehicle classes, not the full inventory.
+ * The company runs more vehicles than the three entries above — several
+ * Sprinters in different seat configurations, plus others — so the page closes
+ * by saying so rather than implying the list is exhaustive.
+ */
+export const fleetNote = {
+  title: "Și multe altele.",
+  body:
+    "Mai sus sunt vehiculele reprezentative, nu toată flota. Avem mai multe microbuze, în configurații diferite de locuri, plus vehicule pe care le adăugăm pe măsură ce cererea crește. Spune-ne câți sunteți și când vreți să plecați — îți propunem varianta potrivită.",
+  cta: { label: "Cere o ofertă", href: "/inchirieri" },
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                  SERVICES                                   */

@@ -6,7 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
 import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
-import { fleet } from "@/lib/site";
+import { fleet, fleetNote } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -93,20 +93,24 @@ export function FleetSection() {
             </AnimatePresence>
 
             {/* Progress rail doubles as the section's position indicator */}
-            <ol className="mt-12 flex gap-3" aria-label="Vehicule">
-              {fleet.map((item, index) => (
-                <li key={item.slug}>
-                  <span
-                    className={cn(
-                      "block h-0.5 w-16 rounded-full transition-colors duration-500",
-                      index === active ? "bg-accent" : "bg-hairline-strong",
-                    )}
-                    aria-current={index === active ? "true" : undefined}
-                  />
-                  <span className="sr-only">{item.name}</span>
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <ol className="flex gap-3" aria-label="Vehicule">
+                {fleet.map((item, index) => (
+                  <li key={item.slug}>
+                    <span
+                      className={cn(
+                        "block h-0.5 w-16 rounded-full transition-colors duration-500",
+                        index === active ? "bg-accent" : "bg-hairline-strong",
+                      )}
+                      aria-current={index === active ? "true" : undefined}
+                    />
+                    <span className="sr-only">{item.name}</span>
+                  </li>
+                ))}
+              </ol>
+              {/* Three panels shouldn't imply a three-vehicle fleet. */}
+              <span className="text-sm text-ink-dim">{fleetNote.title}</span>
+            </div>
 
             <ButtonLink href="/flota" variant="secondary" size="md" className="group mt-10">
               Vezi toată flota

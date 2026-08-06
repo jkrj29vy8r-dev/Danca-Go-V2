@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ButtonLink } from "@/components/ui/button";
 import { VehicleGallery } from "@/components/fleet/vehicle-gallery";
-import { fleet } from "@/lib/site";
+import { fleet, fleetNote } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Flota",
@@ -64,14 +64,46 @@ export default function FleetPage() {
         ))}
       </div>
 
-      <div className="container-page py-20">
-        <Reveal className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-md text-body-lg text-ink-muted">
-            Ai nevoie de un vehicul pentru un grup? Îți pregătim o ofertă în 24 de ore.
-          </p>
-          <ButtonLink href="/inchirieri" variant="secondary" size="lg">
-            Cere o ofertă
-          </ButtonLink>
+      {/* The list above is representative, not exhaustive — say so plainly
+          rather than letting three entries read as the whole fleet. */}
+      <div className="container-page pt-20 pb-24">
+        <Reveal>
+          <div className="surface-card relative overflow-hidden p-8 md:p-14">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(55% 70% at 15% 0%, rgb(200 164 104 / 0.12), transparent 70%)",
+              }}
+            />
+
+            <div className="relative grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-16">
+              <div>
+                <span aria-hidden className="flex items-center gap-2">
+                  {[0, 1, 2].map((i) => (
+                    <span key={i} className="h-0.5 w-10 rounded-full bg-hairline-strong" />
+                  ))}
+                  <span className="h-0.5 w-10 rounded-full bg-accent" />
+                </span>
+                <h2 className="mt-7 text-headline text-gradient">{fleetNote.title}</h2>
+              </div>
+
+              <div>
+                <p className="max-w-xl text-body-lg leading-relaxed text-ink-muted">
+                  {fleetNote.body}
+                </p>
+                <ButtonLink
+                  href={fleetNote.cta.href}
+                  variant="accent"
+                  size="lg"
+                  className="mt-9"
+                >
+                  {fleetNote.cta.label}
+                </ButtonLink>
+              </div>
+            </div>
+          </div>
         </Reveal>
       </div>
     </>
