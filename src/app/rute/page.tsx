@@ -1,0 +1,95 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowUpRight, Clock } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
+import { Card } from "@/components/ui/card";
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { featuredRoutes } from "@/lib/site";
+import { formatDuration, formatPrice } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Rute",
+  description:
+    "Toate rutele Danca Go: Otopeni, București și Constanța către Bacău, Roman, Piatra Neamț și Adjud.",
+};
+
+const hubs = [
+  { key: "otopeni", label: "Din Aeroport Otopeni" },
+  { key: "bucuresti", label: "Din București" },
+  { key: "constanta", label: "Din Constanța" },
+] as const;
+
+export default function RoutesPage() {
+  return (
+    <>
+      <PageHeader
+        eyebrow="Rețeaua"
+        title="Toate rutele noastre."
+        lead="Legături directe între aeroport, capitală, Moldova și litoral — operate cu aceleași standarde pe fiecare kilometru."
+      />
+
+      <div className="container-page flex flex-col gap-24 pb-24">
+        {hubs.map((hub) => {
+          const routes = featuredRoutes.filter((route) => route.hub === hub.key);
+          if (routes.length === 0) return null;
+
+          return (
+            <section key={hub.key}>
+              <Reveal>
+                <h2 className="text-title text-ink">{hub.label}</h2>
+              </Reveal>
+
+              <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {routes.map((route) => (
+                  <RevealItem key={route.slug}>
+                    <Card className="h-full">
+                      <Link
+                        href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
+                        className="flex h-full flex-col justify-between gap-10 p-7"
+                      >
+                        <div>
+                          <div className="flex items-start justify-between gap-4">
+                            <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                              {route.frequency}
+                            </span>
+                            <ArrowUpRight
+                              aria-hidden
+                              className="size-4 shrink-0 text-ink-faint transition-all duration-500 ease-[var(--ease-out-expo)] group-hover/card:-translate-y-0.5 group-hover/card:translate-x-0.5 group-hover/card:text-accent"
+                            />
+                          </div>
+
+                          <p className="mt-6 text-title text-ink">{route.from}</p>
+                          <p className="mt-1 flex items-center gap-2.5 text-title text-ink-muted">
+                            <span aria-hidden className="text-accent">
+                              ↓
+                            </span>
+                            {route.to}
+                          </p>
+                        </div>
+
+                        <div className="flex items-end justify-between gap-4 border-t border-hairline pt-5">
+                          <span className="flex items-center gap-1.5 text-sm text-ink-dim">
+                            <Clock className="size-3.5" aria-hidden />
+                            {formatDuration(route.durationMinutes)}
+                          </span>
+                          <span className="text-right">
+                            <span className="block text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                              de la
+                            </span>
+                            <span className="text-lg font-medium tabular-nums text-ink">
+                              {formatPrice(route.fromPrice)}
+                            </span>
+                          </span>
+                        </div>
+                      </Link>
+                    </Card>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
+            </section>
+          );
+        })}
+      </div>
+    </>
+  );
+}

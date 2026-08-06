@@ -1,0 +1,246 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   DANCA GO — DESIGN SYSTEM
+   Tailwind v4 CSS-first tokens. Single source of truth for the brand.
+   ========================================================================== */
+
+@theme {
+  /* --- Surfaces: near-black, layered by luminance not by border --- */
+  --color-void: #030303;
+  --color-base: #050505;
+  --color-surface: #0a0a0a;
+  --color-raised: #101012;
+  --color-overlay: #16161a;
+
+  /* --- Ink: Apple-style neutral ramp on dark --- */
+  --color-ink: #ffffff;
+  --color-ink-muted: #a1a1a6;
+  --color-ink-dim: #6e6e73;
+  --color-ink-faint: #3a3a3e;
+
+  /* --- Accent: soft gold. Expensive, warm, non-tech. --- */
+  --color-accent: #c8a468;
+  --color-accent-bright: #e0bf8a;
+  --color-accent-deep: #8a6f3f;
+
+  /* --- Hairlines: light-on-dark strokes, never grey boxes --- */
+  --color-hairline: rgb(255 255 255 / 0.08);
+  --color-hairline-strong: rgb(255 255 255 / 0.14);
+
+  /* --- Status --- */
+  --color-positive: #4ade80;
+  --color-warning: #fbbf24;
+  --color-negative: #f87171;
+
+  /* --- Type --- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Display scale — fluid, Apple-like jumps between steps */
+  --text-display-xl: clamp(2.75rem, 7.2vw, 6.5rem);
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.045em;
+  --text-display-xl--font-weight: 600;
+
+  --text-display: clamp(2.75rem, 7vw, 6rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.04em;
+  --text-display--font-weight: 600;
+
+  --text-headline: clamp(2rem, 4.2vw, 3.5rem);
+  --text-headline--line-height: 1.06;
+  --text-headline--letter-spacing: -0.03em;
+  --text-headline--font-weight: 600;
+
+  --text-title: clamp(1.375rem, 2.2vw, 1.875rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 500;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--letter-spacing: -0.011em;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.18em;
+  --text-eyebrow--font-weight: 500;
+
+  /* Motion — one shared easing vocabulary so everything feels related */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-swift: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Hero entrances are CSS, not JS.
+   The headline is the LCP element — driving it with Framer Motion would mean
+   shipping it as opacity:0 in the SSR HTML and waiting for hydration before it
+   paints. These keyframes start the moment the stylesheet applies. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(1.25rem); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);       filter: blur(0); }
+}
+
+@keyframes word-rise {
+  from { transform: translateY(110%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.6; }
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--color-hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto; /* Lenis owns scrolling */
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-void);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Dark, minimal scrollbar that doesn't fight the design */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--color-base); }
+  ::-webkit-scrollbar-thumb {
+    background: #232326;
+    border-radius: 999px;
+    border: 3px solid var(--color-base);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #34343a; }
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  max-width: 84rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 3rem;
+  }
+}
+
+/* Text that fades from white to grey — Apple's headline treatment */
+@utility text-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 45%, #9b9ba1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-accent {
+  background: linear-gradient(120deg, var(--color-accent-bright), var(--color-accent) 55%, var(--color-accent-deep));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Linear-style bordered surface: gradient hairline, not a flat 1px grey */
+@utility surface-card {
+  position: relative;
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.01)),
+    var(--color-surface);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+    0 1px 2px rgb(0 0 0 / 0.4),
+    0 8px 32px -8px rgb(0 0 0 / 0.6);
+}
+
+@utility hairline-t {
+  border-top: 1px solid var(--color-hairline);
+}
+
+/* Masks the bottom of 3D canvases into the page background */
+@utility mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+/* Entrance for above-the-fold content. `backwards` holds the from-state during
+   the delay; without JS or with animations disabled the element still ends
+   fully visible. */
+@utility anim-rise {
+  animation: rise-in 0.9s var(--ease-out-expo) backwards;
+}
+
+@utility anim-word {
+  display: inline-block;
+  animation: word-rise 1s var(--ease-out-expo) backwards;
+}
+
+@utility grain {
+  position: relative;
+  isolation: isolate;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* ==========================================================================
+   ACCESSIBILITY
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

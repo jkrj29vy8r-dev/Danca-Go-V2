@@ -1,0 +1,142 @@
+# Danca Go
+
+Premium dark-mode website for **Danca Go** (Danca Util Ideal S.R.L.) — Romanian
+passenger coach operator. Next.js 15 App Router, TypeScript, Tailwind v4,
+React Three Fiber, Supabase.
+
+---
+
+## Getting started
+
+```bash
+npm install
+cp .env.example .env.local     # fill in your Supabase keys
+npm run dev
+```
+
+The marketing site renders fully without Supabase configured — data-backed
+surfaces detect the missing env and show a designed fallback state instead of
+crashing. Add the keys to enable search, booking and rental enquiries.
+
+### Database
+
+```bash
+# Against a Supabase project (or `supabase db reset` locally)
+psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
+psql "$DATABASE_URL" -f supabase/seed.sql          # optional demo data
+```
+
+Regenerate types after any schema change:
+
+```bash
+npx supabase gen types typescript --project-id <id> > src/lib/types/database.ts
+```
+
+### Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+
+---
+
+## Architecture
+
+```
+src/
+├── app/
+│   ├── layout.tsx              Root layout: fonts, metadata, JSON-LD, chrome
+│   ├── page.tsx                Homepage
+│   ├── rezervare/              Search results → [tripId] checkout
+│   ├── rute/ flota/ despre/ contact/
+│   └── inchirieri/             Charter enquiry + Server Action
+├── components/
+│   ├── ui/                     Design-system primitives (Button, Card, Eyebrow)
+│   ├── layout/                 Navbar, Footer, PageHeader, Logo
+│   ├── motion/                 Lenis + GSAP provider, scroll reveal primitives
+│   ├── three/                  3D coach, studio rig, performance gate
+│   ├── home/                   Homepage sections
+│   ├── booking/ rentals/       Forms
+├── lib/
+│   ├── site.ts                 Company facts, navigation, routes, fleet
+│   ├── schemas.ts              Zod schemas shared by client + Server Actions
+│   ├── queries.ts              Server-only data access
+│   ├── supabase/               Browser / server / middleware clients
+│   └── types/database.ts       Schema mirror
+└── middleware.ts               Auth session refresh
+supabase/
+├── migrations/0001_init.sql    Schema, functions, RLS
+└── seed.sql                    Network, fleet, 30 days of departures
+```
+
+### Key decisions
+
+**Design tokens live in CSS, not a JS config.** Tailwind v4's `@theme` block in
+`globals.css` is the single source of truth for colour, type scale, easing and
+spacing. Fluid `clamp()` display sizes mean no breakpoint-specific font rules.
+
+**The 3D coach is procedural, not a GLB.** A photoreal coach model is a
+15–40 MB download that would dominate LCP on the hero. The vehicle is built
+from rounded primitives with clearcoat paint, lit by drei `<Lightformer>`
+panels inside a locally-rendered `<Environment>` — no HDR file is fetched, so
+there's no external request and no CSP exception. Swap in `useGLTF` later
+without touching the scene rig.
+
+**The 3D is gated three ways.** `CoachStage` code-splits the Three.js bundle,
+mounts it only when the hero is near the viewport, and skips WebGL entirely on
+`prefers-reduced-motion` or low-core/low-memory devices — falling back to a
+vector silhouette. First Load JS for the homepage stays at ~170 kB.
+
+**The camera solves its own framing.** `CameraTarget` derives distance from the
+canvas aspect ratio so the coach stays fully in frame from a wide desktop band
+to a narrow phone, instead of relying on hardcoded positions.
+
+**Hero entrances are CSS, not Framer Motion.** The headline is the LCP element;
+driving it with JS would ship it as `opacity: 0` in the SSR HTML and delay
+paint until hydration. Below the fold, `Reveal`/`RevealGroup` use Framer Motion
+`whileInView` where that trade-off doesn't apply.
+
+**Seat inventory is enforced in Postgres.** `book_trip()` locks the trip row,
+validates availability, decrements inventory and writes the booking in one
+transaction. Clients have no INSERT policy on `bookings` and no UPDATE policy
+on `trips`, so overselling is impossible even under concurrent purchases —
+there is no code path that mutates one without the other.
+
+**Guest checkout without leaking data.** Bookings are readable via RLS only by
+their owner or staff. Guests (no `user_id`) retrieve theirs through
+`get_booking_by_ref(ref, email)`, a `SECURITY DEFINER` function where the
+reference plus email acts as the shared secret.
+
+**Validation is defined once, enforced twice.** Zod schemas in `lib/schemas.ts`
+back both the client form (immediate feedback) and the Server Action (the
+actual trust boundary).
+
+---
+
+## Data model
+
+| Table | Purpose |
+| --- | --- |
+| `profiles` | App user data, mirrored from `auth.users`; carries `role` |
+| `cities` | Network nodes |
+| `routes` / `route_stops` | Directional city pairs and intermediate stops |
+| `vehicles` | Fleet, seat counts and layouts |
+| `trips` | Dated, sellable instance of a route; owns seat inventory |
+| `bookings` / `booking_passengers` | Sales |
+| `rentals` | Charter enquiries |
+
+`trip_search` is a `security_invoker` view joining trips → routes → cities →
+vehicles, so the booking UI stays thin and RLS still applies.
+
+Money is stored in **bani** (integer minor units) everywhere. Never floats.
+
+---
+
+## Notes
+
+- Primary language is Romanian, including error messages raised from Postgres.
+- `npm audit` reports advisories in `postcss` and `sharp`; both are transitive
+  dependencies of `next` and resolve with an upstream Next.js release.
