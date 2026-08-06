@@ -289,8 +289,9 @@ export const fleet: FleetClass[] = [
       { label: "Utilizare", value: "Curse regulate & transfer" },
     ],
     features: ["Climatizare", "Scaune individuale", "Spațiu bagaje", "Acces ușă la ușă"],
-    image: "/fleet/sprinter.jpg",
+    image: "/fleet/sprinter-white.jpg",
     gallery: [
+      { src: "/fleet/sprinter.jpg", alt: "Microbuz Mercedes-Benz Sprinter gri, văzut din lateral față" },
       { src: "/fleet/sprinter-rear.jpg", alt: "Microbuzul Mercedes-Benz Sprinter din spate, cu rutele afișate pe caroserie" },
       { src: "/fleet/sprinter-aeroport.jpg", alt: "Microbuz Sprinter în așteptare la terminalul aeroportului" },
       { src: "/fleet/sprinter-pair.jpg", alt: "Două microbuze Sprinter din flota Danca Go, parcate unul lângă altul" },

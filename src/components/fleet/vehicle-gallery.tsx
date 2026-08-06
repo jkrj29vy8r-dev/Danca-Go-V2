@@ -24,7 +24,9 @@ export function VehicleGallery({
       <VehiclePhoto vehicle={vehicle} priority={priority} />
 
       {gallery.length > 0 && (
-        <ul className="grid grid-cols-2 gap-3">
+        // A lone final tile spans the row rather than leaving a hole, so the
+        // gallery stays balanced at any photo count.
+        <ul className="grid grid-cols-2 gap-3 [&>li:last-child:nth-child(odd)]:col-span-2">
           {gallery.map((shot) => (
             <li key={shot.src}>
               {/* 16:10 matches the processed source crop exactly. A different
