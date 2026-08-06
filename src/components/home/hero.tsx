@@ -2,7 +2,7 @@ import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
 import { SearchWidget } from "./search-widget";
 import { ButtonLink } from "@/components/ui/button";
-import { site } from "@/lib/site";
+import { formatCount, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
@@ -33,7 +33,7 @@ export function Hero() {
             </span>
             <span aria-hidden className="h-3 w-px bg-hairline-strong" />
             <span className="text-ink-muted">
-              {site.rating.count}+ pasageri, din {site.founded}
+              {formatCount(site.rating.count)}+ pasageri, din {site.founded}
             </span>
           </div>
         </div>
@@ -48,8 +48,8 @@ export function Hero() {
           className="anim-rise mx-auto mt-7 max-w-xl text-center text-body-lg text-ink-muted"
           style={{ animationDelay: "0.75s" }}
         >
-          Curse zilnice între Otopeni, București, Moldova și litoral. Autocare
-          moderne, plecări la fix, bilet rezervat în mai puțin de un minut.
+          Curse zilnice din Moldova spre București, Otopeni și Constanța.
+          Închirieri de autocare și microbuze de la 12 locuri, cu șofer.
         </p>
 
         <div

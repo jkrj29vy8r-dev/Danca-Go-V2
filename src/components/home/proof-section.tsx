@@ -38,7 +38,7 @@ export function ProofSection() {
 
               <div className="mt-8 flex items-start gap-5">
                 <span className="text-[clamp(4rem,9vw,7rem)] font-semibold leading-[0.85] tracking-[-0.05em] tabular-nums text-gradient">
-                  <CountUp value={site.rating.score} decimals={2} />
+                  <CountUp value={site.rating.score} decimals={1} />
                 </span>
                 <span className="mt-2 text-lg text-ink-dim">/ {site.rating.max}</span>
               </div>

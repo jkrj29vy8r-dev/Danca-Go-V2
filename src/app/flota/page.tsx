@@ -3,12 +3,13 @@ import { Check } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ButtonLink } from "@/components/ui/button";
+import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
 import { fleet } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Flota",
   description:
-    "Autocare de 35 și 57 de locuri și microbuze de 8—20 locuri, întreținute obsesiv și verificate înainte de fiecare cursă lungă.",
+    "Un autocar Setra, mai multe microbuze Mercedes-Benz Sprinter de la 12 locuri și un Mercedes-Benz Vito — întreținute obsesiv și verificate înainte de fiecare cursă lungă.",
 };
 
 export default function FleetPage() {
@@ -17,7 +18,7 @@ export default function FleetPage() {
       <PageHeader
         eyebrow="Flota"
         title="Vehicule pe care te poți baza."
-        lead="Fiecare autocar intră în revizie la 15.000 km și trece printr-o verificare tehnică înainte de orice cursă de distanță lungă."
+        lead="Un autocar Setra, mai multe Sprintere de la 12 locuri și un Vito. Fiecare vehicul trece printr-o verificare tehnică înainte de orice cursă lungă."
       />
 
       <div className="container-page flex flex-col gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline pb-0">
@@ -42,18 +43,22 @@ export default function FleetPage() {
                 </ul>
               </div>
 
-              <RevealGroup className="grid grid-cols-2 gap-px self-start overflow-hidden rounded-2xl border border-hairline bg-hairline">
-                {vehicle.specs.map((spec) => (
-                  <RevealItem key={spec.label}>
-                    <div className="flex h-full flex-col justify-between gap-8 bg-raised p-6">
-                      <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
-                        {spec.label}
-                      </span>
-                      <span className="text-title font-medium text-ink">{spec.value}</span>
-                    </div>
-                  </RevealItem>
-                ))}
-              </RevealGroup>
+              <div className="flex flex-col gap-6">
+                <VehiclePhoto vehicle={vehicle} />
+
+                <RevealGroup className="grid grid-cols-2 gap-px self-start overflow-hidden rounded-2xl border border-hairline bg-hairline">
+                  {vehicle.specs.map((spec) => (
+                    <RevealItem key={spec.label}>
+                      <div className="flex h-full flex-col justify-between gap-8 bg-raised p-6">
+                        <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                          {spec.label}
+                        </span>
+                        <span className="text-title font-medium text-ink">{spec.value}</span>
+                      </div>
+                    </RevealItem>
+                  ))}
+                </RevealGroup>
+              </div>
             </article>
           </Reveal>
         ))}

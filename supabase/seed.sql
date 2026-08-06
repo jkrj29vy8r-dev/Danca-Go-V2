@@ -1,50 +1,65 @@
 -- ============================================================================
--- DANCA GO — seed data (real network, fleet and 30 days of departures)
+-- DANCA GO — seed data (real network, real fleet, 30 days of departures)
 -- Idempotent: safe to re-run.
+--
+-- Seat counts, fares and durations are operational values. Confirm them
+-- against the current timetable and the vehicle registration documents before
+-- going live.
 -- ============================================================================
 
 insert into public.cities (slug, name, county, latitude, longitude, is_hub) values
-  ('otopeni',      'Aeroport Otopeni', 'Ilfov',      44.572160, 26.102040, true),
-  ('bucuresti',    'București',        'București',  44.426767, 26.102538, true),
-  ('bacau',        'Bacău',            'Bacău',      46.567810, 26.913870, true),
-  ('roman',        'Roman',            'Neamț',      46.928330, 26.927500, false),
+  ('targu-neamt',  'Târgu Neamț',      'Neamț',      47.202500, 26.365800, false),
   ('piatra-neamt', 'Piatra Neamț',     'Neamț',      46.927500, 26.370280, false),
-  ('adjud',        'Adjud',            'Vrancea',    46.100000, 27.166670, false),
-  ('constanta',    'Constanța',        'Constanța',  44.179250, 28.634400, true),
+  ('roman',        'Roman',            'Neamț',      46.928330, 26.927500, true),
+  ('bacau',        'Bacău',            'Bacău',      46.567810, 26.913870, false),
   ('onesti',       'Onești',           'Bacău',      46.248610, 26.766940, false),
-  ('buzau',        'Buzău',            'Buzău',      45.150000, 26.833330, false)
+  ('adjud',        'Adjud',            'Vrancea',    46.100000, 27.166670, false),
+  ('focsani',      'Focșani',          'Vrancea',    45.696900, 27.183600, false),
+  ('buzau',        'Buzău',            'Buzău',      45.150000, 26.833330, false),
+  ('bucuresti',    'București',        'București',  44.426767, 26.102538, true),
+  ('otopeni',      'Aeroport Otopeni', 'Ilfov',      44.572160, 26.102040, true),
+  ('constanta',    'Constanța',        'Constanța',  44.179250, 28.634400, true)
 on conflict (slug) do nothing;
 
+-- The real fleet: one Setra touring coach, several Mercedes-Benz Sprinter
+-- minibuses (smallest is a 12-seater) and a Mercedes-Benz Vito.
 insert into public.vehicles (slug, name, class, seat_count, seat_layout, amenities, is_active) values
-  ('autocar-57', 'Autocar 57 locuri', 'coach', 57,
-   '{"rows": 15, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Wi-Fi', 'Climatizare pe zone', 'Toaletă', 'Priză 220V', 'USB-C', 'Suspensie pneumatică'], true),
-  ('autocar-35', 'Autocar 35 locuri', 'coach', 35,
-   '{"rows": 9, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Wi-Fi', 'Climatizare', 'Priză 220V', 'Scaune rabatabile'], true),
-  ('microbuz-20', 'Microbuz 20 locuri', 'minibus', 20,
+  ('setra-coach', 'Setra — autocar', 'coach', 49,
+   '{"rows": 13, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
+   array['Climatizare pe zone', 'Suspensie pneumatică', 'Scaune rabatabile', 'Cală de bagaje', 'Priză 220V'], true),
+  ('sprinter-20', 'Mercedes-Benz Sprinter 20', 'minibus', 20,
    '{"rows": 5, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare', 'Scaune piele', 'Transfer ușă la ușă'], true),
-  ('microbuz-8', 'Microbuz 8 locuri', 'minibus', 8,
+   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], true),
+  ('sprinter-16', 'Mercedes-Benz Sprinter 16', 'minibus', 16,
+   '{"rows": 4, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
+   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], true),
+  ('sprinter-12', 'Mercedes-Benz Sprinter 12', 'minibus', 12,
+   '{"rows": 3, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
+   array['Climatizare', 'Scaune individuale', 'Acces ușă la ușă'], true),
+  ('vito',        'Mercedes-Benz Vito', 'minibus', 8,
    '{"rows": 2, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare', 'Scaune piele', 'Transfer aeroport'], true)
+   array['Transfer aeroport', 'Climatizare', 'Rută flexibilă'], true)
 on conflict (slug) do nothing;
 
 -- Routes are inserted in both directions from a compact definition list.
 with pairs (slug, origin, dest, minutes, price, km) as (
   values
-    ('otopeni-bacau',        'otopeni',   'bacau',        320, 12000, 300),
-    ('otopeni-roman',        'otopeni',   'roman',        380, 13500, 350),
-    ('otopeni-piatra-neamt', 'otopeni',   'piatra-neamt', 420, 15000, 385),
-    ('bucuresti-bacau',      'bucuresti', 'bacau',        300, 11000, 285),
-    ('bucuresti-roman',      'bucuresti', 'roman',        360, 12500, 335),
-    ('bucuresti-adjud',      'bucuresti', 'adjud',        255, 10000, 230),
-    ('constanta-bacau',      'constanta', 'bacau',        390, 14000, 360),
-    ('constanta-roman',      'constanta', 'roman',        450, 15500, 410)
+    ('targu-neamt-bucuresti',  'targu-neamt',  'bucuresti', 390, 14000, 380),
+    ('targu-neamt-otopeni',    'targu-neamt',  'otopeni',   380, 14000, 370),
+    ('piatra-neamt-bucuresti', 'piatra-neamt', 'bucuresti', 360, 13000, 350),
+    ('piatra-neamt-otopeni',   'piatra-neamt', 'otopeni',   350, 13000, 340),
+    ('roman-bucuresti',        'roman',        'bucuresti', 330, 12000, 330),
+    ('roman-otopeni',          'roman',        'otopeni',   320, 12000, 320),
+    ('roman-constanta',        'roman',        'constanta', 390, 15000, 400),
+    ('bacau-bucuresti',        'bacau',        'bucuresti', 300, 11000, 300),
+    ('bacau-otopeni',          'bacau',        'otopeni',   285, 11000, 290),
+    ('adjud-bucuresti',        'adjud',        'bucuresti', 240,  9000, 240),
+    ('focsani-bucuresti',      'focsani',      'bucuresti', 190,  8000, 190),
+    ('buzau-bucuresti',        'buzau',        'bucuresti', 110,  6000, 110)
 )
 insert into public.routes (slug, origin_city_id, dest_city_id, duration_minutes, base_price, distance_km)
 select
-  case when d.reversed then split_part(p.slug, '-', 2) || '-' || p.origin else p.slug end,
+  case when d.reversed then p.dest || '-' || p.origin else p.slug end,
   case when d.reversed then c2.id else c1.id end,
   case when d.reversed then c1.id else c2.id end,
   p.minutes,
@@ -57,6 +72,7 @@ from pairs p
 on conflict (slug) do nothing;
 
 -- 30 days of scheduled departures: two per route per day (morning + evening).
+-- Long corridors get the Setra; shorter regional runs get a Sprinter.
 insert into public.trips (route_id, vehicle_id, departure_date, departure_time, arrival_time, price, seats_total)
 select
   r.id,
@@ -68,18 +84,24 @@ select
   v.seat_count
 from public.routes r
   cross join generate_series(0, 29) as offs
-  cross join (values (time '07:00'), (time '17:30')) as slot(dep)
+  cross join (values (time '06:30'), (time '16:30')) as slot(dep)
   join public.vehicles v on v.slug = case
-    when r.duration_minutes >= 380 then 'autocar-57'
-    else 'autocar-35'
+    when r.duration_minutes >= 350 then 'setra-coach'
+    when r.duration_minutes >= 240 then 'sprinter-20'
+    else 'sprinter-16'
   end
 where r.is_active
 on conflict (route_id, departure_date, departure_time) do nothing;
 
--- Add intermediate stops on the two longest corridors.
+-- Regional pickup points along the Moldova → București corridor.
 insert into public.route_stops (route_id, city_id, position, minutes_from_start, location_name)
-select r.id, c.id, 0, 120, 'Ieșire A2 — parcare Peco'
+select r.id, c.id, s.position, s.minutes, s.location_name
 from public.routes r
-  join public.cities c on c.slug = 'buzau'
-where r.slug in ('bucuresti-bacau', 'otopeni-bacau')
+  cross join (values
+    ('adjud',   0, 90,  'Adjud — stație centrală'),
+    ('focsani', 1, 135, 'Focșani — autogară'),
+    ('buzau',   2, 210, 'Buzău — ieșire DN2')
+  ) as s(city_slug, position, minutes, location_name)
+  join public.cities c on c.slug = s.city_slug
+where r.slug in ('roman-bucuresti', 'bacau-bucuresti', 'piatra-neamt-bucuresti', 'targu-neamt-bucuresti')
 on conflict (route_id, position) do nothing;

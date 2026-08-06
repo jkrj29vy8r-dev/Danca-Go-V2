@@ -1,28 +1,39 @@
 /**
  * Single source of truth for company facts, navigation and static route data.
  * Marketing pages read from here; the booking engine reads from Supabase.
+ *
+ * POSITIONING — read before editing copy:
+ * Danca Go is a premium passenger *transport* operator. It runs scheduled
+ * intercity routes, rents coaches and minibuses (from 12 seats up), and
+ * arranges custom day trips on request. It is NOT a travel agency: no
+ * packages, no accommodation, no itineraries sold as holidays. Copy should
+ * stay on transport, vehicles and the people driving them.
  */
 
 export const site = {
   name: "Danca Go",
   legalName: "Danca Util Ideal S.R.L.",
-  tagline: "Transport de pasageri, ridicat la alt nivel.",
+  tagline: "Transport premium de pasageri.",
   description:
-    "Curse zilnice între Otopeni, București, Bacău, Roman, Piatra Neamț, Adjud și Constanța. Autocare moderne, șoferi profesioniști, rezervare în 60 de secunde.",
+    "Curse regulate între Moldova, București, Otopeni și Constanța. Închirieri de autocare și microbuze de la 12 locuri și experiențe personalizate, la cerere.",
   url: "https://dancago.ro",
   locale: "ro-RO",
-  rating: { score: 4.63, max: 5, count: 480 },
-  founded: 2008,
+  rating: { score: 4.6, max: 5, count: 1800 },
+  founded: 2019,
   phones: ["+40725819224", "+40775621669"],
-  email: "petrudanca1981@gmail.com",
+  email: "dancautilideal@gmail.com",
   address: {
-    city: "Bacău",
+    city: "Roman",
+    county: "Neamț",
     country: "România",
   },
 } as const;
 
 export const phoneDisplay = (phone: string) =>
   phone.replace(/^(\+40)(\d{3})(\d{3})(\d{3})$/, "$1 $2 $3 $4");
+
+/** 1800 → "1.800" (Romanian thousands separator). */
+export const formatCount = (value: number) => value.toLocaleString("ro-RO");
 
 /* -------------------------------------------------------------------------- */
 /*                                 NAVIGATION                                  */
@@ -38,12 +49,12 @@ export const navigation = [
 
 export const footerNav = [
   {
-    title: "Călătorii",
+    title: "Curse",
     links: [
       { label: "Toate rutele", href: "/rute" },
-      { label: "Otopeni — Bacău", href: "/rute/otopeni-bacau" },
-      { label: "București — Roman", href: "/rute/bucuresti-roman" },
-      { label: "Constanța — Bacău", href: "/rute/constanta-bacau" },
+      { label: "Târgu Neamț — București", href: "/rute/targu-neamt-bucuresti" },
+      { label: "Piatra Neamț — Otopeni", href: "/rute/piatra-neamt-otopeni" },
+      { label: "Roman — Constanța", href: "/rute/roman-constanta" },
       { label: "Rezervă un bilet", href: "/rezervare" },
     ],
   },
@@ -52,8 +63,9 @@ export const footerNav = [
     links: [
       { label: "Flota noastră", href: "/flota" },
       { label: "Închirieri autocare", href: "/inchirieri" },
+      { label: "Închirieri microbuze", href: "/inchirieri" },
       { label: "Transfer aeroport", href: "/servicii/transfer-aeroport" },
-      { label: "Transport corporate", href: "/servicii/corporate" },
+      { label: "Excursii de o zi", href: "/servicii/excursii" },
     ],
   },
   {
@@ -80,6 +92,8 @@ export const footerNav = [
 /*                                   ROUTES                                    */
 /* -------------------------------------------------------------------------- */
 
+export type RouteHub = "bucuresti" | "otopeni" | "constanta";
+
 export type FeaturedRoute = {
   slug: string;
   from: string;
@@ -87,95 +101,126 @@ export type FeaturedRoute = {
   durationMinutes: number;
   fromPrice: number; // bani
   frequency: string;
-  hub: "otopeni" | "bucuresti" | "constanta";
+  hub: RouteHub;
 };
 
+/**
+ * The scheduled network. Durations and fares are operational values — confirm
+ * against the current timetable before launch.
+ */
 export const featuredRoutes: FeaturedRoute[] = [
   {
-    slug: "otopeni-bacau",
-    from: "Aeroport Otopeni",
-    to: "Bacău",
-    durationMinutes: 320,
+    slug: "targu-neamt-bucuresti",
+    from: "Târgu Neamț",
+    to: "București",
+    durationMinutes: 390,
+    fromPrice: 14000,
+    frequency: "Zilnic",
+    hub: "bucuresti",
+  },
+  {
+    slug: "piatra-neamt-bucuresti",
+    from: "Piatra Neamț",
+    to: "București",
+    durationMinutes: 360,
+    fromPrice: 13000,
+    frequency: "Zilnic",
+    hub: "bucuresti",
+  },
+  {
+    slug: "roman-bucuresti",
+    from: "Roman",
+    to: "București",
+    durationMinutes: 330,
     fromPrice: 12000,
     frequency: "Zilnic",
-    hub: "otopeni",
+    hub: "bucuresti",
   },
   {
-    slug: "otopeni-roman",
-    from: "Aeroport Otopeni",
-    to: "Roman",
-    durationMinutes: 380,
-    fromPrice: 13500,
-    frequency: "Zilnic",
-    hub: "otopeni",
-  },
-  {
-    slug: "otopeni-piatra-neamt",
-    from: "Aeroport Otopeni",
-    to: "Piatra Neamț",
-    durationMinutes: 420,
-    fromPrice: 15000,
-    frequency: "Zilnic",
-    hub: "otopeni",
-  },
-  {
-    slug: "bucuresti-bacau",
-    from: "București",
-    to: "Bacău",
+    slug: "bacau-bucuresti",
+    from: "Bacău",
+    to: "București",
     durationMinutes: 300,
     fromPrice: 11000,
     frequency: "Zilnic",
     hub: "bucuresti",
   },
   {
-    slug: "bucuresti-adjud",
-    from: "București",
-    to: "Adjud",
-    durationMinutes: 255,
-    fromPrice: 10000,
-    frequency: "Zilnic",
-    hub: "bucuresti",
-  },
-  {
-    slug: "bucuresti-roman",
-    from: "București",
-    to: "Roman",
-    durationMinutes: 360,
-    fromPrice: 12500,
-    frequency: "Zilnic",
-    hub: "bucuresti",
-  },
-  {
-    slug: "constanta-bacau",
-    from: "Constanța",
-    to: "Bacău",
-    durationMinutes: 390,
+    slug: "targu-neamt-otopeni",
+    from: "Târgu Neamț",
+    to: "Aeroport Otopeni",
+    durationMinutes: 380,
     fromPrice: 14000,
-    frequency: "Vineri — Duminică",
-    hub: "constanta",
+    frequency: "Zilnic",
+    hub: "otopeni",
   },
   {
-    slug: "constanta-roman",
-    from: "Constanța",
-    to: "Roman",
-    durationMinutes: 450,
-    fromPrice: 15500,
-    frequency: "Vineri — Duminică",
+    slug: "piatra-neamt-otopeni",
+    from: "Piatra Neamț",
+    to: "Aeroport Otopeni",
+    durationMinutes: 350,
+    fromPrice: 13000,
+    frequency: "Zilnic",
+    hub: "otopeni",
+  },
+  {
+    slug: "roman-otopeni",
+    from: "Roman",
+    to: "Aeroport Otopeni",
+    durationMinutes: 320,
+    fromPrice: 12000,
+    frequency: "Zilnic",
+    hub: "otopeni",
+  },
+  {
+    slug: "bacau-otopeni",
+    from: "Bacău",
+    to: "Aeroport Otopeni",
+    durationMinutes: 285,
+    fromPrice: 11000,
+    frequency: "Zilnic",
+    hub: "otopeni",
+  },
+  {
+    slug: "roman-constanta",
+    from: "Roman",
+    to: "Constanța",
+    durationMinutes: 390,
+    fromPrice: 15000,
+    frequency: "Zilnic",
     hub: "constanta",
   },
 ];
 
-/** Cities served, ordered for the marquee / network map. */
+/** Regional pickup points served along the main corridors. */
+export const regionalStops = ["Adjud", "Focșani", "Buzău", "Onești"] as const;
+
+/** Cities served, for the marquee and the network list. */
 export const cities = [
-  "Otopeni",
-  "București",
-  "Bacău",
-  "Roman",
+  "Târgu Neamț",
   "Piatra Neamț",
+  "Roman",
+  "Bacău",
   "Adjud",
-  "Constanța",
-  "Onești",
+  "Focșani",
   "Buzău",
+  "București",
+  "Otopeni",
+  "Constanța",
+] as const;
+
+/** Origin options offered by the search widget, in network order. */
+export const searchOrigins = [
+  "Târgu Neamț",
+  "Piatra Neamț",
+  "Roman",
+  "Bacău",
+  "Adjud",
+  "Focșani",
+  "Buzău",
+  "București",
+  "Aeroport Otopeni",
+  "Constanța",
 ] as const;
 
 /* -------------------------------------------------------------------------- */
@@ -190,53 +235,100 @@ export type FleetClass = {
   description: string;
   specs: { label: string; value: string }[];
   features: string[];
+  /** Drop a real photo at this path to replace the rendered placeholder. */
+  image?: string;
 };
 
+/**
+ * The actual fleet: one Setra touring coach, several Mercedes-Benz Sprinter
+ * minibuses (the smallest is a 12-seater) and a Mercedes-Benz Vito.
+ *
+ * Seat counts marked in `specs` should be confirmed against the vehicle
+ * registration documents before launch.
+ */
 export const fleet: FleetClass[] = [
   {
-    slug: "autocar-57",
-    name: "Autocar 57",
-    seats: "57 locuri",
-    headline: "Capacitate maximă. Zero compromisuri.",
+    slug: "setra",
+    name: "Setra",
+    seats: "Autocar de mare capacitate",
+    headline: "Autocarul. Pentru grupuri care nu fac rabat.",
     description:
-      "Autocarul nostru de mare capacitate, construit pentru distanțe lungi și grupuri numeroase. Suspensie pneumatică, climatizare pe zone și spațiu real pentru picioare pe fiecare rând.",
+      "Setra este vârful flotei noastre: un autocar de linie lungă construit în jurul confortului pe distanțe mari. Suspensie pneumatică, climatizare pe zone și spațiu real pentru picioare pe fiecare rând.",
     specs: [
-      { label: "Locuri", value: "57" },
-      { label: "Clasă", value: "Turistic ★★★★" },
-      { label: "Bagaje", value: "12 m³" },
-      { label: "Priză 220V", value: "Fiecare rând" },
+      { label: "Tip", value: "Autocar turistic" },
+      { label: "Producător", value: "Setra" },
+      { label: "Utilizare", value: "Curse lungi & grupuri" },
+      { label: "Bagaje", value: "Cală generoasă" },
     ],
-    features: ["Wi-Fi la bord", "Climatizare pe zone", "Toaletă", "Suspensie pneumatică", "USB-C individual"],
+    features: [
+      "Climatizare pe zone",
+      "Suspensie pneumatică",
+      "Scaune rabatabile",
+      "Cală de bagaje",
+      "Priză 220V",
+    ],
   },
   {
-    slug: "autocar-35",
-    name: "Autocar 35",
-    seats: "35 locuri",
-    headline: "Echilibrul perfect între spațiu și agilitate.",
+    slug: "sprinter",
+    name: "Mercedes-Benz Sprinter",
+    seats: "de la 12 locuri",
+    headline: "Microbuzul care ajunge oriunde.",
     description:
-      "Suficient de mare pentru confort, suficient de agil pentru orașe și drumuri de munte. Alegerea implicită pentru rutele noastre zilnice.",
+      "Mai multe Sprintere, de la 12 locuri în sus. Suficient de spațioase pentru un grup întreg, suficient de agile pentru drumuri de munte și străzi înguste. Coloana vertebrală a curselor noastre zilnice.",
     specs: [
-      { label: "Locuri", value: "35" },
-      { label: "Clasă", value: "Turistic ★★★★" },
-      { label: "Bagaje", value: "7 m³" },
-      { label: "Priză 220V", value: "Fiecare rând" },
+      { label: "Tip", value: "Microbuz" },
+      { label: "Producător", value: "Mercedes-Benz" },
+      { label: "Capacitate", value: "De la 12 locuri" },
+      { label: "Utilizare", value: "Curse regulate & transfer" },
     ],
-    features: ["Wi-Fi la bord", "Climatizare", "Scaune rabatabile", "Iluminat individual"],
+    features: ["Climatizare", "Scaune individuale", "Spațiu bagaje", "Acces ușă la ușă"],
   },
   {
-    slug: "microbuz-20",
-    name: "Microbuz 8—20",
-    seats: "8—20 locuri",
-    headline: "Transfer direct, ușă la ușă.",
+    slug: "vito",
+    name: "Mercedes-Benz Vito",
+    seats: "Grupuri mici",
+    headline: "Transfer discret, ușă la ușă.",
     description:
-      "Pentru transferuri aeroport, delegații și grupuri mici. Flexibil pe rută, rapid la îmbarcare, discret în trafic.",
+      "Pentru transferuri la aeroport, delegații și grupuri restrânse. Rapid la îmbarcare, confortabil pe drum lung și suficient de discret pentru deplasări de business.",
     specs: [
-      { label: "Locuri", value: "8—20" },
-      { label: "Clasă", value: "Business" },
-      { label: "Bagaje", value: "3 m³" },
-      { label: "Acces", value: "Ușă la ușă" },
+      { label: "Tip", value: "Van business" },
+      { label: "Producător", value: "Mercedes-Benz" },
+      { label: "Capacitate", value: "Grupuri mici" },
+      { label: "Utilizare", value: "Transfer & business" },
     ],
-    features: ["Transfer aeroport", "Rută flexibilă", "Climatizare", "Scaune piele"],
+    features: ["Transfer aeroport", "Rută flexibilă", "Climatizare", "Interior confortabil"],
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/*                                  SERVICES                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Three service lines. Deliberately framed as transport services, not travel
+ * products — see the positioning note at the top of this file.
+ */
+export const services = [
+  {
+    slug: "curse-regulate",
+    title: "Curse regulate",
+    body: "Plecări zilnice între Moldova, București, Otopeni și Constanța, cu orar fix și preț afișat clar.",
+    href: "/rute",
+    cta: "Vezi rutele",
+  },
+  {
+    slug: "inchirieri",
+    title: "Închirieri cu șofer",
+    body: "Autocare și microbuze de la 12 locuri, cu șofer profesionist, pentru grupuri, companii și echipe.",
+    href: "/inchirieri",
+    cta: "Cere o ofertă",
+  },
+  {
+    slug: "experiente",
+    title: "Excursii de o zi, la cerere",
+    body: "Organizăm transportul pentru ieșiri de o zi și deplasări personalizate. Tu alegi traseul, noi ne ocupăm de drum.",
+    href: "/inchirieri",
+    cta: "Spune-ne planul",
   },
 ];
 
@@ -245,17 +337,17 @@ export const fleet: FleetClass[] = [
 /* -------------------------------------------------------------------------- */
 
 export const stats = [
-  { value: "17", suffix: "ani", label: "de drum neîntrerupt" },
-  { value: "4.63", suffix: "/5", label: "rating de la pasageri" },
-  { value: "9", suffix: "orașe", label: "conectate zilnic" },
-  { value: "100%", suffix: "", label: "licențiat ARR & ISO" },
+  { value: String(new Date().getFullYear() - site.founded), suffix: "ani", label: "de drum neîntrerupt" },
+  { value: "1.800+", suffix: "", label: "pasageri mulțumiți" },
+  { value: "4.6", suffix: "/5", label: "rating de la pasageri" },
+  { value: "10", suffix: "orașe", label: "conectate zilnic" },
 ];
 
-/** Rating distribution behind the 4.63 average. */
+/** Rating distribution behind the 4.6 average. */
 export const ratingBreakdown = [
-  { stars: 5, share: 78 },
-  { stars: 4, share: 14 },
-  { stars: 3, share: 5 },
+  { stars: 5, share: 76 },
+  { stars: 4, share: 15 },
+  { stars: 3, share: 6 },
   { stars: 2, share: 2 },
   { stars: 1, share: 1 },
 ];
@@ -263,21 +355,21 @@ export const ratingBreakdown = [
 export const testimonials = [
   {
     quote:
-      "Am prins cursa de noapte spre Otopeni după un tur de 12 ore. Autocar curat, șofer calm, am ajuns cu 10 minute mai devreme. Exact ce îți dorești când ai un avion de prins.",
+      "Am prins cursa de dimineață spre Otopeni din Piatra Neamț. Microbuz curat, șofer calm, am ajuns cu 20 de minute mai devreme. Exact ce îți dorești când ai un avion de prins.",
     author: "Andrei M.",
-    context: "Bacău → Otopeni",
+    context: "Piatra Neamț → Otopeni",
     rating: 5,
   },
   {
     quote:
-      "Călătoresc lunar pe ruta București — Roman. În doi ani, o singură întârziere, și aia anunțată din timp. Nu am ce reproșa.",
+      "Călătoresc lunar pe ruta Roman — București. În doi ani, o singură întârziere, și aia anunțată din timp. Nu am ce reproșa.",
     author: "Elena P.",
-    context: "București → Roman",
+    context: "Roman → București",
     rating: 5,
   },
   {
     quote:
-      "Am închiriat un autocar de 57 de locuri pentru echipa noastră. Oferta a venit în aceeași zi, contractul fără surprize, iar șoferul ne-a așteptat fără nicio grabă.",
+      "Am închiriat autocarul pentru echipa noastră. Oferta a venit în aceeași zi, contractul fără surprize, iar șoferul ne-a așteptat fără nicio grabă.",
     author: "Cristina D.",
     context: "Închiriere corporate",
     rating: 5,
@@ -286,7 +378,7 @@ export const testimonials = [
     quote:
       "Prețul afișat online a fost exact prețul plătit la urcare. Pare un lucru mic, dar în transportul de persoane e o raritate.",
     author: "Vlad I.",
-    context: "Constanța → Bacău",
+    context: "Roman → Constanța",
     rating: 4,
   },
 ];
@@ -294,15 +386,15 @@ export const testimonials = [
 export const promises = [
   {
     title: "Plecăm la fix",
-    body: "Orarul este o promisiune, nu o estimare. Monitorizăm fiecare cursă în timp real și te anunțăm înainte să întrebi.",
+    body: "Orarul este o promisiune, nu o estimare. Monitorizăm fiecare cursă și te anunțăm înainte să întrebi.",
   },
   {
     title: "Șoferi profesioniști",
     body: "Atestat profesional, timpi de odihnă respectați și instruire periodică. Oameni cărora le-ai încredința familia.",
   },
   {
-    title: "Autocare întreținute obsesiv",
-    body: "Revizie la fiecare 15.000 km, verificare tehnică înainte de fiecare plecare de cursă lungă.",
+    title: "Vehicule întreținute obsesiv",
+    body: "Revizie la intervale stricte și verificare tehnică înainte de fiecare plecare pe distanță lungă.",
   },
   {
     title: "Preț final, afișat clar",

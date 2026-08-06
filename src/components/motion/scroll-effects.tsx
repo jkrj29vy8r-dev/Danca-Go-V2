@@ -177,7 +177,7 @@ export function ScrollLines({
 
 /**
  * Counts a number up when it scrolls into view. Used for the proof stats —
- * a static "4.63" is a fact, an animating one is a claim being made.
+ * a static "4,6" is a fact, an animating one is a claim being made.
  */
 export function CountUp({
   value,

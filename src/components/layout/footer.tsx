@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { Logo } from "./logo";
-import { footerNav, phoneDisplay, site } from "@/lib/site";
+import { footerNav, formatCount, phoneDisplay, site } from "@/lib/site";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -85,7 +85,7 @@ export function Footer() {
           </p>
           <p className="flex items-center gap-2">
             <span className="text-accent tabular-nums">{site.rating.score}</span>
-            <span>/ {site.rating.max} — evaluat de peste {site.rating.count} pasageri</span>
+            <span>/ {site.rating.max} — evaluat de peste {formatCount(site.rating.count)} de pasageri</span>
           </p>
         </div>
       </div>

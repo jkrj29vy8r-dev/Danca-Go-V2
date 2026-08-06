@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ButtonLink } from "@/components/ui/button";
-import { promises, site, stats } from "@/lib/site";
+import { formatCount, promises, site, stats } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Despre noi",
   description:
-    "Danca Util Ideal SRL transportă pasageri din 2008 între Moldova, București și litoral. Povestea, standardele și oamenii din spatele Danca Go.",
+    "Danca Util Ideal SRL transportă pasageri din 2019 între Moldova, București, Otopeni și Constanța. Povestea, standardele și oamenii din spatele Danca Go.",
 };
 
 export default function AboutPage() {
@@ -15,8 +15,8 @@ export default function AboutPage() {
     <>
       <PageHeader
         eyebrow="Despre noi"
-        title="Din 2008, pe același drum."
-        lead="Am început cu un singur vehicul și o rută. Astăzi conectăm nouă orașe, cu aceeași obsesie pentru punctualitate cu care am plecat la drum."
+        title={`Din ${site.founded}, pe același drum.`}
+        lead="Am început cu un singur vehicul și o rută. Astăzi conectăm zece orașe, cu aceeași obsesie pentru punctualitate cu care am plecat la drum."
       />
 
       <section className="container-page pb-24">
@@ -50,19 +50,21 @@ export default function AboutPage() {
           <Reveal delay={0.1} className="flex flex-col gap-5 text-body-lg leading-relaxed text-ink-muted">
             <p>
               {site.legalName} este o companie românească de transport persoane,
-              fondată în {site.founded} în Bacău. Am crescut încet și deliberat:
+              fondată în {site.founded}, cu sediul în {site.address.city}. Am crescut încet
+              și deliberat:
               fiecare vehicul adăugat în flotă a venit după ce am fost siguri că
               îl putem întreține la standardul pe care îl promitem.
             </p>
             <p>
-              Operăm curse regulate între aeroportul Otopeni, București, orașele
-              din Moldova și litoral, plus servicii de închiriere pentru grupuri.
+              Operăm curse regulate între orașele din Moldova, București, aeroportul
+              Otopeni și Constanța, plus închirieri de autocare și microbuze de
+              la 12 locuri.
               Suntem licențiați ARR, cu toate autorizațiile de transport rutier
               de persoane la zi.
             </p>
             <p>
               Rating-ul nostru de {site.rating.score}/{site.rating.max}, strâns
-              de la peste {site.rating.count} de pasageri, nu vine din marketing.
+              de la peste {formatCount(site.rating.count)} de pasageri, nu vine din marketing.
               Vine din faptul că plecăm la ora anunțată.
             </p>
           </Reveal>

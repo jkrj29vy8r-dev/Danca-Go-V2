@@ -10,13 +10,13 @@ import { formatDuration, formatPrice } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Rute",
   description:
-    "Toate rutele Danca Go: Otopeni, București și Constanța către Bacău, Roman, Piatra Neamț și Adjud.",
+    "Toate rutele Danca Go: Târgu Neamț, Piatra Neamț, Roman și Bacău către București, Otopeni și Constanța.",
 };
 
 const hubs = [
-  { key: "otopeni", label: "Din Aeroport Otopeni" },
-  { key: "bucuresti", label: "Din București" },
-  { key: "constanta", label: "Din Constanța" },
+  { key: "bucuresti", label: "Spre București" },
+  { key: "otopeni", label: "Spre Aeroport Otopeni" },
+  { key: "constanta", label: "Spre Constanța" },
 ] as const;
 
 export default function RoutesPage() {
@@ -25,7 +25,7 @@ export default function RoutesPage() {
       <PageHeader
         eyebrow="Rețeaua"
         title="Toate rutele noastre."
-        lead="Legături directe între aeroport, capitală, Moldova și litoral — operate cu aceleași standarde pe fiecare kilometru."
+        lead="Legături directe între orașele din Moldova, capitală, aeroportul Otopeni și litoral — operate cu aceleași standarde pe fiecare kilometru."
       />
 
       <div className="container-page flex flex-col gap-24 pb-24">

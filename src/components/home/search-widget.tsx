@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpDown, CalendarDays, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cities } from "@/lib/site";
+import { searchOrigins } from "@/lib/site";
 import { cn, toDateKey } from "@/lib/utils";
 
 type Variant = "card" | "dock";
@@ -30,12 +30,12 @@ export function SearchWidget({
   const router = useRouter();
   const today = useMemo(() => toDateKey(new Date()), []);
 
-  const [from, setFrom] = useState("Aeroport Otopeni");
-  const [to, setTo] = useState("Bacău");
+  const [from, setFrom] = useState("Roman");
+  const [to, setTo] = useState("București");
   const [date, setDate] = useState(today);
   const [seats, setSeats] = useState(1);
 
-  const options = useMemo(() => ["Aeroport Otopeni", ...cities.filter((c) => c !== "Otopeni")], []);
+  const options = useMemo(() => [...searchOrigins], []);
 
   const swap = () => {
     setFrom(to);

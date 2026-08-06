@@ -200,8 +200,38 @@ Money is stored in **bani** (integer minor units) everywhere. Never floats.
 
 ---
 
+## Positioning
+
+Danca Go is a premium passenger **transport** operator, not a travel agency.
+It sells three things: scheduled intercity seats, coaches and minibuses with a
+driver (from 12 seats up), and transport for custom day trips on request.
+
+Copy must stay on transport, vehicles and drivers — never packages,
+accommodation or itineraries sold as holidays. The rule is restated at the top
+of `lib/site.ts`, which is where all marketing copy originates.
+
+## Data to confirm before launch
+
+The company facts in `lib/site.ts` and `supabase/seed.sql` are real; a few
+operational values are reasoned placeholders and should be checked:
+
+- **Seat counts** per vehicle (the Setra is seeded at 49, Sprinters at 12/16/20)
+- **Fares** and **journey durations** on every route
+- **Departure times** — seeded as 06:30 and 16:30 daily
+- **Rating distribution** in `ratingBreakdown` (the 4.6 average is real, the
+  per-star split is modelled)
+
+Fleet photography is not included. `components/fleet/vehicle-photo.tsx` renders
+a designed placeholder until real images exist — drop a file at
+`/public/fleet/<slug>.jpg` and set `image` on the fleet entry to swap it in.
+Stock photos of vehicles the company does not own were deliberately avoided.
+
 ## Notes
 
 - Primary language is Romanian, including error messages raised from Postgres.
+- shadcn/ui is wired up (`components.json`, Radix primitives, `cn`) with the
+  canonical `cva` + `Slot` + `asChild` Button. shadcn is copy-in source rather
+  than a dependency, so the files live in `components/ui` and carry the Danca
+  Go variants instead of the stock ones.
 - `npm audit` reports advisories in `postcss` and `sharp`; both are transitive
   dependencies of `next` and resolve with an upstream Next.js release.

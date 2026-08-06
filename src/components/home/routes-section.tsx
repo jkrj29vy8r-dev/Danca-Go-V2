@@ -19,11 +19,11 @@ export function RoutesSection() {
         <Reveal className="max-w-2xl">
           <Eyebrow>Rețeaua</Eyebrow>
           <h2 className="mt-6 text-headline text-gradient">
-            Nouă orașe. O singură companie.
+            Zece orașe. O singură companie.
           </h2>
           <p className="mt-5 max-w-lg text-body-lg text-ink-muted">
-            Legături directe între aeroport, capitală, Moldova și litoral —
-            operate zilnic, cu aceleași standarde pe fiecare kilometru.
+            Din Târgu Neamț, Piatra Neamț, Roman și Bacău spre București,
+            Otopeni și Constanța — zilnic, cu opriri regionale pe traseu.
           </p>
         </Reveal>
 
