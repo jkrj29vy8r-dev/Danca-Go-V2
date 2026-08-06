@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform }
 import { ArrowRight, Check } from "lucide-react";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
+import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
 import { fleet } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -113,22 +114,40 @@ export function FleetSection() {
             </ButtonLink>
           </div>
 
-          {/* --- Spec column --- */}
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline">
-            {vehicle.specs.map((spec, index) => (
+          {/* --- Visual column: photo, then specs ---
+              The photo slot is the primary element. Until the real Setra /
+              Sprinter / Vito shots land it renders a designed placeholder; the
+              layout is already sized for them, so dropping the files in
+              changes nothing structurally. */}
+          <div className="flex flex-col gap-4">
+            <AnimatePresence mode="wait">
               <motion.div
-                key={`${vehicle.slug}-${spec.label}`}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: EASE, delay: 0.06 * index }}
-                className="flex flex-col justify-between gap-8 bg-surface p-7 md:p-9"
+                key={`${vehicle.slug}-photo`}
+                initial={{ opacity: 0, scale: 0.97, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
+                transition={{ duration: 0.8, ease: EASE }}
               >
-                <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
-                  {spec.label}
-                </span>
-                <span className="text-title font-medium text-ink">{spec.value}</span>
+                <VehiclePhoto vehicle={vehicle} />
               </motion.div>
-            ))}
+            </AnimatePresence>
+
+            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline sm:grid-cols-4">
+              {vehicle.specs.map((spec, index) => (
+                <motion.div
+                  key={`${vehicle.slug}-${spec.label}`}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: EASE, delay: 0.06 * index }}
+                  className="flex flex-col justify-between gap-4 bg-surface p-5"
+                >
+                  <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                    {spec.label}
+                  </span>
+                  <span className="font-medium text-ink">{spec.value}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -9,17 +9,17 @@ import { CtaSection } from "@/components/home/cta-section";
 
 /**
  * Homepage narrative:
- *   hero (desire + action) → services (what we sell) → network (where) →
- *   fleet (with what) → proof (why trust us) → standards (how) → close
+ *   hero (desire + action) → network (where) → fleet (with what) →
+ *   services (what we sell) → proof (why trust us) → standards (how) → close
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
       <CityMarquee />
-      <ServicesSection />
       <RoutesSection />
       <FleetSection />
+      <ServicesSection />
       <ProofSection />
       <PromiseSection />
       <CtaSection />

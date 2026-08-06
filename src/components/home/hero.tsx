@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
 import { SearchWidget } from "./search-widget";
@@ -40,7 +41,9 @@ export function Hero() {
 
         <h1 className="mt-8 text-center text-display-xl text-gradient">
           <WordReveal text="Drumul tău," delay={0.2} />
-          <br />
+          {/* <br> contributes no whitespace to textContent, so the two lines
+              would otherwise concatenate for screen readers and crawlers. */}
+          <br />{" "}
           <WordReveal text="fără compromisuri." delay={0.34} />
         </h1>
 
@@ -136,23 +139,25 @@ function WordReveal({
   return (
     <span className={cn("inline-block", className)}>
       {words.map((word, index) => (
-        // The gap between words is a margin on the mask, not a space inside it:
-        // whitespace at the end of an inline-block gets collapsed away, which
-        // silently runs the words together.
-        <span
-          key={`${word}-${index}`}
-          className={cn(
-            "inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]",
-            index < words.length - 1 && "mr-[0.22em]",
-          )}
-        >
-          <span
-            className="anim-word"
-            style={{ animationDelay: `${delay + index * 0.055}s` }}
-          >
-            {word}
+        <Fragment key={`${word}-${index}`}>
+          <span className="inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]">
+            <span
+              className="anim-word"
+              style={{ animationDelay: `${delay + index * 0.055}s` }}
+            >
+              {word}
+            </span>
           </span>
-        </span>
+          {/*
+            A real space, as a text node *between* the masks — not inside one.
+            Trailing whitespace within an inline-block gets trimmed, which is
+            what silently ran the words together ("Drumultău"). Setting a
+            margin instead fixes the visuals but leaves textContent unspaced,
+            so screen readers and crawlers still read one long word. A sibling
+            text node is the only version that's correct both ways.
+          */}
+          {index < words.length - 1 ? " " : null}
+        </Fragment>
       ))}
     </span>
   );
