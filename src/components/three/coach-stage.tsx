@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { detectQuality, type QualitySettings } from "./quality";
 import { cn } from "@/lib/utils";
 
 /**
  * Performance gate for the hero canvas.
  *
  * The Three.js bundle is code-split and only requested once the stage is
- * actually near the viewport AND the device looks capable. On reduced-motion
- * or clearly low-powered hardware we render a static silhouette instead, so
- * the hero still composes correctly with zero WebGL cost.
+ * actually near the viewport AND the device has been graded as capable. On
+ * reduced-motion or clearly low-powered hardware nothing is downloaded at all —
+ * a static vector silhouette renders instead, so the hero still composes with
+ * zero WebGL cost and zero wasted bytes.
  */
 
 const CoachScene = dynamic(() => import("./coach-scene"), {
@@ -18,30 +20,19 @@ const CoachScene = dynamic(() => import("./coach-scene"), {
   loading: () => null,
 });
 
-function deviceCanHandleWebGL() {
-  if (typeof window === "undefined") return false;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-
-  // Coarse heuristics — cheap, and wrong only in the conservative direction.
-  const cores = navigator.hardwareConcurrency ?? 4;
-  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
-  if (cores <= 2 || memory <= 2) return false;
-
-  try {
-    const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 export function CoachStage({ className }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shouldRender, setShouldRender] = useState(false);
+  const [quality, setQuality] = useState<QualitySettings | null>(null);
+  const [inView, setInView] = useState(false);
   const [ready, setReady] = useState(false);
 
+  // Grade the device once, up front — this decides whether we even observe.
   useEffect(() => {
-    if (!deviceCanHandleWebGL()) return;
+    setQuality(detectQuality());
+  }, []);
+
+  useEffect(() => {
+    if (!quality || quality.tier === "none") return;
 
     const node = ref.current;
     if (!node) return;
@@ -49,7 +40,7 @@ export function CoachStage({ className }: { className?: string }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setShouldRender(true);
+          setInView(true);
           observer.disconnect();
         }
       },
@@ -58,15 +49,17 @@ export function CoachStage({ className }: { className?: string }) {
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [quality]);
 
-  // Fade the canvas in once the first frame has had a chance to paint,
-  // so the hero never flashes an empty box.
+  // Fade the canvas in once the first frame has had a chance to paint, so the
+  // hero never flashes an empty box.
   useEffect(() => {
-    if (!shouldRender) return;
+    if (!inView) return;
     const timer = window.setTimeout(() => setReady(true), 120);
     return () => window.clearTimeout(timer);
-  }, [shouldRender]);
+  }, [inView]);
+
+  const shouldRender = Boolean(quality && quality.tier !== "none" && inView);
 
   return (
     <div ref={ref} className={cn("relative", className)}>
@@ -80,14 +73,14 @@ export function CoachStage({ className }: { className?: string }) {
         }}
       />
 
-      {shouldRender ? (
+      {shouldRender && quality ? (
         <div
           className={cn(
             "absolute inset-0 transition-opacity duration-1000 ease-[var(--ease-out-expo)]",
             ready ? "opacity-100" : "opacity-0",
           )}
         >
-          <CoachScene />
+          <CoachScene quality={quality} />
         </div>
       ) : (
         <StaticCoach />

@@ -79,11 +79,14 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
       roughness: 0.92,
     });
 
+    // Deliberately dim for polished alloy. At full brightness these catch the
+    // environment strips hard and, once bloom is applied, read as glowing
+    // slabs rather than wheels.
     const hub = new THREE.MeshStandardMaterial({
-      color: "#9aa0a8",
+      color: "#5c6169",
       metalness: 1,
-      roughness: 0.22,
-      envMapIntensity: 2.2,
+      roughness: 0.38,
+      envMapIntensity: 1,
     });
 
     // Tone-mapped and restrained: unmapped emissives at high intensity clip to

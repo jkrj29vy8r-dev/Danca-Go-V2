@@ -88,7 +88,36 @@ without touching the scene rig.
 **The 3D is gated three ways.** `CoachStage` code-splits the Three.js bundle,
 mounts it only when the hero is near the viewport, and skips WebGL entirely on
 `prefers-reduced-motion` or low-core/low-memory devices — falling back to a
-vector silhouette. First Load JS for the homepage stays at ~170 kB.
+vector silhouette. Three.js and the post-processing composer live in the lazy
+chunk, so the homepage's First Load JS is unaffected by them.
+
+**"Cinematic" and "60fps on mid-range" are in tension, so the scene ships two
+grades.** `quality.ts` probes cores, memory, touch and the unmasked GPU string,
+then returns a settings object. The `high` tier adds a bloom + vignette pass,
+real shadows and DPR 2; `low` drops the composer and halves the environment
+resolution; `none` renders no canvas at all. Probing errs conservative — being
+wrong costs a plainer render, never a dropped frame budget.
+
+### Using the scene elsewhere
+
+`CoachScene` is prop-driven and has no hero-specific logic, so it can be reused
+on fleet pages or in a configurator:
+
+```tsx
+<CoachScene
+  autoRotate={0.055}        // turntable speed, rad/s (0 disables)
+  scrollInfluence={0.8}     // extra yaw as the section scrolls past
+  pointerInfluence={0.1}    // mouse parallax strength
+  floatAmplitude={0.04}     // vertical drift, metres
+  quality={detectQuality()} // or omit to let it probe
+/>
+```
+
+Pose is composed from three independent sources. Auto-rotation accumulates as a
+velocity, while scroll and pointer are absolute offsets applied on top — so
+scrolling back up returns to the same relative pose instead of fighting the
+turntable. Frame deltas are clamped to 1/30s so a backgrounded tab doesn't
+produce a visible jump on return.
 
 **The camera solves its own framing.** `CameraTarget` derives distance from the
 canvas aspect ratio so the coach stays fully in frame from a wide desktop band
@@ -105,6 +134,12 @@ hard-edged grey stage rather than wet asphalt, and its per-frame blur was
 measurably the most expensive thing in the scene — screenshot capture went from
 seconds to timing out. `ContactShadows` grounds the vehicle for a fraction of
 the cost.
+
+**The gradient dome belongs inside `<Environment>`, not the scene.** Reflections
+come from the environment's cube map, so a dome placed in the scene graph
+contributes nothing to them and simply paints an opaque box over the
+transparent canvas. As an `<Environment>` child it shapes the reflections in
+the gaps between lightformer strips while staying invisible to the camera.
 
 **Hero entrances are CSS, not Framer Motion.** The headline is the LCP element;
 driving it with JS would ship it as `opacity: 0` in the SSR HTML and delay
