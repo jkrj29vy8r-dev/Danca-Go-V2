@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ButtonLink } from "@/components/ui/button";
-import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
+import { VehicleGallery } from "@/components/fleet/vehicle-gallery";
 import { fleet } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ export default function FleetPage() {
       />
 
       <div className="container-page flex flex-col gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline pb-0">
-        {fleet.map((vehicle) => (
+        {fleet.map((vehicle, vehicleIndex) => (
           <Reveal key={vehicle.slug}>
             <article className="grid gap-10 bg-surface p-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:p-14">
               <div>
@@ -44,7 +44,7 @@ export default function FleetPage() {
               </div>
 
               <div className="flex flex-col gap-6">
-                <VehiclePhoto vehicle={vehicle} />
+                <VehicleGallery vehicle={vehicle} priority={vehicleIndex === 0} />
 
                 <RevealGroup className="grid grid-cols-2 gap-px self-start overflow-hidden rounded-2xl border border-hairline bg-hairline">
                   {vehicle.specs.map((spec) => (

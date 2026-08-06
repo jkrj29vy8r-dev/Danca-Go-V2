@@ -235,8 +235,10 @@ export type FleetClass = {
   description: string;
   specs: { label: string; value: string }[];
   features: string[];
-  /** Drop a real photo at this path to replace the rendered placeholder. */
+  /** Primary photo. Absent → VehiclePhoto renders its placeholder. */
   image?: string;
+  /** Additional real photography for the fleet page gallery. */
+  gallery?: { src: string; alt: string }[];
 };
 
 /**
@@ -255,7 +257,7 @@ export const fleet: FleetClass[] = [
     description:
       "Setra este vârful flotei noastre: un autocar de linie lungă construit în jurul confortului pe distanțe mari. Suspensie pneumatică, climatizare pe zone și spațiu real pentru picioare pe fiecare rând.",
     specs: [
-      { label: "Tip", value: "Autocar turistic" },
+      { label: "Model", value: "S 517 HD" },
       { label: "Producător", value: "Setra" },
       { label: "Utilizare", value: "Curse lungi & grupuri" },
       { label: "Bagaje", value: "Cală generoasă" },
@@ -267,6 +269,11 @@ export const fleet: FleetClass[] = [
       "Cală de bagaje",
       "Priză 220V",
     ],
+    image: "/fleet/setra.jpg",
+    gallery: [
+      { src: "/fleet/setra-interior.jpg", alt: "Interiorul autocarului Setra, culoar central și scaune din piele" },
+      { src: "/fleet/setra-interior-2.jpg", alt: "Scaunele autocarului Setra văzute dinspre spate, cu măsuțe rabatabile" },
+    ],
   },
   {
     slug: "sprinter",
@@ -276,12 +283,19 @@ export const fleet: FleetClass[] = [
     description:
       "Mai multe Sprintere, de la 12 locuri în sus. Suficient de spațioase pentru un grup întreg, suficient de agile pentru drumuri de munte și străzi înguste. Coloana vertebrală a curselor noastre zilnice.",
     specs: [
-      { label: "Tip", value: "Microbuz" },
+      { label: "Model", value: "Sprinter 517 CDI" },
       { label: "Producător", value: "Mercedes-Benz" },
       { label: "Capacitate", value: "De la 12 locuri" },
       { label: "Utilizare", value: "Curse regulate & transfer" },
     ],
     features: ["Climatizare", "Scaune individuale", "Spațiu bagaje", "Acces ușă la ușă"],
+    image: "/fleet/sprinter.jpg",
+    gallery: [
+      { src: "/fleet/sprinter-rear.jpg", alt: "Microbuzul Mercedes-Benz Sprinter din spate, cu rutele afișate pe caroserie" },
+      { src: "/fleet/sprinter-aeroport.jpg", alt: "Microbuz Sprinter în așteptare la terminalul aeroportului" },
+      { src: "/fleet/sprinter-pair.jpg", alt: "Două microbuze Sprinter din flota Danca Go, parcate unul lângă altul" },
+      { src: "/fleet/sprinter-city.jpg", alt: "Microbuz Sprinter negru, folosit pentru transfer aeroport" },
+    ],
   },
   {
     slug: "vito",
@@ -297,6 +311,7 @@ export const fleet: FleetClass[] = [
       { label: "Utilizare", value: "Transfer & business" },
     ],
     features: ["Transfer aeroport", "Rută flexibilă", "Climatizare", "Interior confortabil"],
+    image: "/fleet/vito.jpg",
   },
 ];
 

@@ -3,15 +3,11 @@ import { cn } from "@/lib/utils";
 import type { FleetClass } from "@/lib/site";
 
 /**
- * Fleet imagery slot.
+ * Primary fleet photo for a vehicle.
  *
- * The brief calls for real photos of the Setra, the Sprinters and the Vito.
- * Until those are supplied, this renders a designed placeholder rather than a
- * broken image or a stock photo of someone else's bus — showing a vehicle the
- * company doesn't own would be worse than showing none.
- *
- * To go live: drop the photo in /public/fleet/<slug>.jpg and set `image` on
- * the entry in `lib/site.ts`. Nothing else changes.
+ * Falls back to a designed placeholder when `image` is unset — a vehicle added
+ * to the fleet before its photo shoot still renders correctly, rather than
+ * showing a broken image or a stock photo of someone else's bus.
  */
 export function VehiclePhoto({
   vehicle,
@@ -32,7 +28,7 @@ export function VehiclePhoto({
       {vehicle.image ? (
         <Image
           src={vehicle.image}
-          alt={`${vehicle.name} — flota Danca Go`}
+          alt={`${vehicle.name} din flota Danca Go, fotografiat în exterior`}
           fill
           priority={priority}
           sizes="(min-width: 1024px) 50vw, 100vw"

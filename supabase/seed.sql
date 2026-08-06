@@ -23,22 +23,22 @@ on conflict (slug) do nothing;
 
 -- The real fleet: one Setra touring coach, several Mercedes-Benz Sprinter
 -- minibuses (smallest is a 12-seater) and a Mercedes-Benz Vito.
-insert into public.vehicles (slug, name, class, seat_count, seat_layout, amenities, is_active) values
+insert into public.vehicles (slug, name, class, seat_count, seat_layout, amenities, image_url, is_active) values
   ('setra-coach', 'Setra — autocar', 'coach', 49,
    '{"rows": 13, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare pe zone', 'Suspensie pneumatică', 'Scaune rabatabile', 'Cală de bagaje', 'Priză 220V'], true),
+   array['Climatizare pe zone', 'Suspensie pneumatică', 'Scaune rabatabile', 'Cală de bagaje', 'Priză 220V'], '/fleet/setra.jpg', true),
   ('sprinter-20', 'Mercedes-Benz Sprinter 20', 'minibus', 20,
    '{"rows": 5, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], true),
+   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], '/fleet/sprinter.jpg', true),
   ('sprinter-16', 'Mercedes-Benz Sprinter 16', 'minibus', 16,
    '{"rows": 4, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], true),
+   array['Climatizare', 'Scaune individuale', 'Spațiu bagaje'], '/fleet/sprinter.jpg', true),
   ('sprinter-12', 'Mercedes-Benz Sprinter 12', 'minibus', 12,
    '{"rows": 3, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Climatizare', 'Scaune individuale', 'Acces ușă la ușă'], true),
+   array['Climatizare', 'Scaune individuale', 'Acces ușă la ușă'], '/fleet/sprinter.jpg', true),
   ('vito',        'Mercedes-Benz Vito', 'minibus', 8,
    '{"rows": 2, "columns": ["A", "B", "aisle", "C", "D"]}'::jsonb,
-   array['Transfer aeroport', 'Climatizare', 'Rută flexibilă'], true)
+   array['Transfer aeroport', 'Climatizare', 'Rută flexibilă'], '/fleet/vito.jpg', true)
 on conflict (slug) do nothing;
 
 -- Routes are inserted in both directions from a compact definition list.

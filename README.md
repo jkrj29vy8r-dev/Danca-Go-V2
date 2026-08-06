@@ -221,10 +221,21 @@ operational values are reasoned placeholders and should be checked:
 - **Rating distribution** in `ratingBreakdown` (the 4.6 average is real, the
   per-star split is modelled)
 
-Fleet photography is not included. `components/fleet/vehicle-photo.tsx` renders
-a designed placeholder until real images exist — drop a file at
-`/public/fleet/<slug>.jpg` and set `image` on the fleet entry to swap it in.
-Stock photos of vehicles the company does not own were deliberately avoided.
+## Fleet photography
+
+Real photography lives in `/public/fleet`, processed to 16:10 at 1600×1000
+(~160–250 KB each) plus an 800×500 variant. `VehiclePhoto` renders the primary
+shot and `VehicleGallery` adds the rest; a vehicle with no `image` still
+renders correctly via a designed placeholder.
+
+Two rules learned the hard way:
+
+- **Gallery tiles must match the processed crop's aspect (16:10).** A different
+  aspect lets `object-cover` re-crop an already-framed photo — 4:3 tiles pushed
+  the coach interiors up into the ceiling.
+- **`sharp.strategy.attention` is not reliable for vehicles.** It framed the
+  Vito on the trees and sky behind it. Crops are verified visually, and the
+  Vito uses an explicit offset.
 
 ## Notes
 
