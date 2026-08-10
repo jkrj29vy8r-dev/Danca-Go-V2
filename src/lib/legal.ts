@@ -10,9 +10,12 @@ import { site } from "./site";
  * ACCURACY NOTE — this text describes what the site actually does today:
  * bookings are held for 30 minutes and settled in cash on boarding (see
  * `src/lib/payments.ts`), the only cookies set are Supabase's session cookies
- * (see `src/middleware.ts`), and there is no analytics or advertising script
- * anywhere in the bundle. If any of that changes, these documents change with
- * it — they are not boilerplate.
+ * (see `src/middleware.ts`), and the only visitor-facing data collection is
+ * Vercel Web Analytics + Speed Insights (see `src/app/layout.tsx`) — both
+ * cookieless, both reporting anonymous, aggregate page-view and performance
+ * data with no cross-site tracking. There is no advertising script anywhere
+ * in the bundle, and no fingerprinting. If any of that changes, these
+ * documents change with it — they are not boilerplate.
  */
 
 export type LegalBlock =
@@ -347,12 +350,16 @@ const privacy: LegalDoc = {
               "Vizitarea site-ului",
               "Date tehnice standard de server: adresa IP, tipul de browser și pagina accesată, păstrate în jurnalele furnizorilor noștri de infrastructură.",
             ],
+            [
+              "Vizitarea site-ului (statistici)",
+              "Vercel Web Analytics și Speed Insights măsoară, fără cookie-uri și fără să te poată identifica, ce pagini sunt vizitate și cât de repede se încarcă site-ul pe dispozitivul tău. Datele sunt agregate — nu construim un profil al tău și nu te putem recunoaște la o vizită ulterioară.",
+            ],
           ],
         },
         {
           type: "note",
           title: "Ce nu colectăm",
-          text: "Nu folosim instrumente de analiză a traficului, nu avem pixeli publicitari și nu urmărim comportamentul vizitatorilor între site-uri. Nu îți cerem CNP-ul pentru o rezervare obișnuită și nu prelucrăm categorii speciale de date.",
+          text: "Nu avem pixeli publicitari, nu vindem date către rețele de publicitate și nu urmărim comportamentul vizitatorilor între site-uri. Nu îți cerem CNP-ul pentru o rezervare obișnuită și nu prelucrăm categorii speciale de date.",
         },
       ],
     },
@@ -379,6 +386,10 @@ const privacy: LegalDoc = {
             [
               "Siguranța călătoriei, soluționarea reclamațiilor și apărarea drepturilor noastre în caz de litigiu.",
               "Art. 6 alin. (1) lit. f) — interes legitim.",
+            ],
+            [
+              "Statistici anonime de trafic și performanță, ca să știm dacă site-ul funcționează bine pentru vizitatori.",
+              "Art. 6 alin. (1) lit. f) — interes legitim. Fiind agregate și fără cookie-uri, nu necesită consimțământul tău.",
             ],
           ],
         },
@@ -415,6 +426,7 @@ const privacy: LegalDoc = {
           type: "list",
           items: [
             "Furnizorul bazei de date și al infrastructurii de aplicație, care găzduiește rezervările în Uniunea Europeană, în calitate de persoană împuternicită.",
+            "Furnizorul de găzduire a site-ului (Vercel), care rulează și statisticile anonime de trafic descrise mai sus.",
             "Contabilul și, unde legea o cere, autoritățile fiscale.",
             "Procesatorul de plăți, în momentul în care vom activa plata cu cardul. Datele cardului nu ajung și nu vor ajunge pe serverele noastre.",
             "Autoritățile publice, exclusiv atunci când legea ne obligă.",
@@ -526,7 +538,7 @@ const cookies: LegalDoc = {
       blocks: [
         {
           type: "p",
-          text: "Doar cookie-uri strict necesare. Nu avem cookie-uri de analiză, de publicitate sau de urmărire între site-uri, iar în paginile noastre nu este încărcat niciun script de terț în acest scop.",
+          text: "Doar cookie-uri strict necesare. Nu avem cookie-uri de publicitate sau de urmărire între site-uri, iar în paginile noastre nu este încărcat niciun script de terț în acest scop.",
         },
         {
           type: "table",
@@ -546,8 +558,13 @@ const cookies: LegalDoc = {
         },
         {
           type: "note",
+          title: "Statisticile de trafic nu folosesc cookie-uri",
+          text: "Măsurăm vizitele și viteza de încărcare a paginilor cu Vercel Web Analytics și Speed Insights. Ambele funcționează fără să salveze niciun cookie și fără niciun identificator care să te urmărească de la o vizită la alta — de aceea nu apar în tabelul de mai sus.",
+        },
+        {
+          type: "note",
           title: "De ce nu vezi un banner de cookies",
-          text: "Legea impune consimțământul pentru cookie-urile care nu sunt strict necesare funcționării serviciului. Pentru că folosim exclusiv cookie-uri strict necesare, un banner de consimțământ nu este obligatoriu — și nu îți mai furăm un clic degeaba.",
+          text: "Legea impune consimțământul pentru cookie-urile care nu sunt strict necesare funcționării serviciului. Pentru că folosim exclusiv cookie-uri strict necesare — iar statisticile de trafic nu folosesc deloc cookie-uri — un banner de consimțământ nu este obligatoriu, și nu îți mai furăm un clic degeaba.",
         },
       ],
     },

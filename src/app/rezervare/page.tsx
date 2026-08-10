@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Clock, Info, Users } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -8,13 +7,20 @@ import { ButtonLink } from "@/components/ui/button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { searchTrips } from "@/lib/queries";
 import { featuredRoutes, phoneDisplay, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { formatDuration, formatPrice, formatTime } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/rezervare",
   title: "Rezervare",
   description:
     "Caută și rezervă bilete pentru cursele Danca Go. Plecări zilnice din Otopeni, București și Constanța.",
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Rezervare", path: "/rezervare" },
+]);
 
 // Seat availability changes constantly — never serve a cached seat count.
 export const dynamic = "force-dynamic";
@@ -40,6 +46,11 @@ export default async function BookingPage({
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Rezervare"
         title="Găsește-ți cursa."

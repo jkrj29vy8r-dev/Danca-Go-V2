@@ -379,10 +379,18 @@ operational values are reasoned placeholders and should be checked:
 ### Keeping the legal text honest
 
 `lib/legal.ts` describes what the site actually does — a 30-minute seat hold,
-cash on boarding, Supabase session cookies and no analytics whatsoever. Those
-claims are load-bearing: the cookie policy is the reason there is no consent
-banner. If payments, analytics or any third-party script are added, the
-documents change in the same commit, and `LEGAL_UPDATED` gets bumped.
+cash on boarding, Supabase session cookies, and Vercel Web Analytics + Speed
+Insights (cookieless, anonymous, added in this pass). Those claims are
+load-bearing: the cookie policy's "no consent banner" reasoning rests on every
+tracking mechanism on the site being either strictly necessary or cookieless.
+When Analytics was added, three places needed updating in the same commit —
+the privacy policy's data table and legal-basis table, the cookie policy's
+"no cookies for this" claim, and the source comment at the top of the file —
+because a partial update here is exactly how a site ends up truthfully
+claiming "no consent banner" while an untruthfully-described tool runs behind
+it. If payments or an actual advertising/tracking script are added later, the
+same rule applies: documents change in the same commit, `LEGAL_UPDATED` gets
+bumped.
 
 `lib/faq.ts` restates several of the same policies in plainer language. The two
 files must agree; a FAQ that contradicts the terms is worse than no FAQ.

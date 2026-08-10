@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "sonner";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { site } from "@/lib/site";
+import { openingHours, priceRange, site } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -61,14 +63,22 @@ const structuredData = {
   legalName: site.legalName,
   description: site.description,
   url: site.url,
+  image: `${site.url}/opengraph-image`,
   email: site.email,
   telephone: site.phones,
   foundingDate: String(site.founded),
+  priceRange,
   address: {
     "@type": "PostalAddress",
     addressLocality: site.address.city,
     addressCountry: "RO",
   },
+  openingHoursSpecification: openingHours.map((hours) => ({
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: hours.days,
+    opens: hours.opens,
+    closes: hours.closes,
+  })),
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: site.rating.score,
@@ -103,6 +113,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             },
           }}
         />
+
+        {/* Both are no-ops anywhere but Vercel's own infrastructure — safe
+            to ship unconditionally rather than branching on an env var, and
+            they start reporting the moment Analytics/Speed Insights is
+            switched on in the Vercel project dashboard, no redeploy needed. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

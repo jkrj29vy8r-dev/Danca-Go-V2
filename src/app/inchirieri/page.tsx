@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { ArrowRight, Check, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { RentalForm } from "@/components/rentals/rental-form";
@@ -10,16 +9,28 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
 import { fleet, fleetNote, phoneDisplay, rentalBenefits, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/inchirieri",
   title: "Închiriază autocar",
   description:
     "Închiriere de autocare și microbuze cu șofer, de la 12 locuri: Setra, Mercedes-Benz Sprinter și Vito. Ofertă fermă în 24 de ore.",
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Închirieri", path: "/inchirieri" },
+]);
 
 export default function RentalsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Închirieri"
         title="Autocarul tău, programul tău."

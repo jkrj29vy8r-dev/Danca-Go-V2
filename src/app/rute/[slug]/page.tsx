@@ -20,13 +20,8 @@ import { ScaleIn } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqJsonLd, type FaqItem } from "@/lib/faq";
-import {
-  featuredRoutes,
-  getRoute,
-  intermediateStops,
-  site,
-  type FeaturedRoute,
-} from "@/lib/site";
+import { featuredRoutes, getRoute, intermediateStops, site, type FeaturedRoute } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
 /** Nine static pages — cheap to pre-render, and each one is a landing page. */
@@ -45,19 +40,13 @@ export async function generateMetadata({
   const route = getRoute(slug);
   if (!route) return {};
 
-  const title = `${route.from} — ${route.to}`;
-
-  return {
-    title,
+  return pageMetadata({
+    path: `/rute/${route.slug}`,
+    title: `${route.from} — ${route.to}`,
     description: `Curse ${route.frequency.toLowerCase()} ${route.from} — ${route.to}, aproximativ ${formatDuration(
       route.durationMinutes,
     )}, de la ${formatPrice(route.fromPrice)}. Rezervă online în mai puțin de un minut.`,
-    alternates: { canonical: `/rute/${route.slug}` },
-    openGraph: {
-      title: `${title} — ${site.name}`,
-      description: `Plecări ${route.frequency.toLowerCase()}, de la ${formatPrice(route.fromPrice)}.`,
-    },
-  };
+  });
 }
 
 const bookingHref = (route: FeaturedRoute, reverse = false) =>
@@ -159,12 +148,18 @@ export default async function RoutePage({
     },
   };
 
+  const breadcrumb = breadcrumbJsonLd([
+    { name: "Acasă", path: "/" },
+    { name: "Rute", path: "/rute" },
+    { name: `${route.from} — ${route.to}`, path: `/rute/${route.slug}` },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([structuredData, faqJsonLd(faq)]),
+          __html: JSON.stringify([structuredData, faqJsonLd(faq), breadcrumb]),
         }}
       />
 

@@ -64,13 +64,18 @@ export function BookingLookup() {
             </span>
             <Input
               {...register("booking_ref")}
+              id="booking_ref"
               placeholder="DG-XXXXXXX"
               autoComplete="off"
               spellCheck={false}
               className="font-mono uppercase"
+              aria-invalid={errors.booking_ref ? true : undefined}
+              aria-describedby={errors.booking_ref ? "booking_ref-error" : undefined}
             />
             {errors.booking_ref && (
-              <span className="text-xs text-negative">{errors.booking_ref.message}</span>
+              <span id="booking_ref-error" role="alert" className="text-xs text-negative">
+                {errors.booking_ref.message}
+              </span>
             )}
           </label>
 
@@ -78,14 +83,30 @@ export function BookingLookup() {
             <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
               Email
             </span>
-            <Input {...register("contact_email")} type="email" autoComplete="email" />
+            <Input
+              {...register("contact_email")}
+              id="contact_email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={errors.contact_email ? true : undefined}
+              aria-describedby={errors.contact_email ? "contact_email-error" : undefined}
+            />
             {errors.contact_email && (
-              <span className="text-xs text-negative">{errors.contact_email.message}</span>
+              <span id="contact_email-error" role="alert" className="text-xs text-negative">
+                {errors.contact_email.message}
+              </span>
             )}
           </label>
         </div>
 
-        <Button type="submit" variant="accent" size="lg" disabled={isSubmitting} className="self-start">
+        <Button
+          type="submit"
+          variant="accent"
+          size="lg"
+          disabled={isSubmitting}
+          aria-busy={isSubmitting || undefined}
+          className="self-start"
+        >
           {isSubmitting ? (
             <>
               <Loader2 className="size-4 animate-spin" aria-hidden />
@@ -100,21 +121,27 @@ export function BookingLookup() {
         </Button>
       </form>
 
-      {notFound && (
-        <div className="surface-card p-6">
-          <p className="text-ink">{notFound}</p>
-          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Verifică dacă ai copiat codul exact așa cum apare în email. Dacă tot
-            nu merge, sună-ne la{" "}
-            <a href={`tel:${site.phones[0]}`} className="text-accent hover:underline">
-              {phoneDisplay(site.phones[0])}
-            </a>{" "}
-            și îl căutăm noi.
-          </p>
-        </div>
-      )}
+      {/* Persistent live region: a screen reader only picks up content that
+          changes *inside* an already-mounted aria-live node, so this wraps
+          both outcomes rather than each being its own conditionally-mounted
+          block. */}
+      <div aria-live="polite" aria-atomic="true">
+        {notFound && (
+          <div className="surface-card p-6">
+            <p className="text-ink">{notFound}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+              Verifică dacă ai copiat codul exact așa cum apare în email. Dacă tot
+              nu merge, sună-ne la{" "}
+              <a href={`tel:${site.phones[0]}`} className="text-accent hover:underline">
+                {phoneDisplay(site.phones[0])}
+              </a>{" "}
+              și îl căutăm noi.
+            </p>
+          </div>
+        )}
 
-      {details && <BookingCard details={details} />}
+        {details && <BookingCard details={details} />}
+      </div>
     </div>
   );
 }

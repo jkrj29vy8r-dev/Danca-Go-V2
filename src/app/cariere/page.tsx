@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { ArrowUpRight, Check, Mail, MapPin, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
@@ -9,13 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { careerBenefits, hiringSteps, openRoles } from "@/lib/careers";
 import { phoneDisplay, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/cariere",
   title: "Cariere",
   description:
     "Posturi deschise la Danca Go: șoferi autocar și microbuz, șoferi transfer aeroport și dispecer. Vehicule întreținute, salariu la timp, timpi de odihnă respectați.",
-  alternates: { canonical: "/cariere" },
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Cariere", path: "/cariere" },
+]);
 
 /** mailto with the role already in the subject — one less thing to type. */
 function applyHref(role?: string) {
@@ -26,6 +31,11 @@ function applyHref(role?: string) {
 export default function CareersPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Cariere"
         title="Căutăm oameni care iau volanul în serios."

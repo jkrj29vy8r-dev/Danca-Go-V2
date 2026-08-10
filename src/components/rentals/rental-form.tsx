@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { cloneElement, useId, useState, type ReactElement } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -78,7 +78,13 @@ export function RentalForm({
 
   if (reference) {
     return (
-      <div className={cn("surface-card p-8 md:p-10", className)}>
+      // role="status": the form this replaces may have had focus, so the
+      // swap needs to announce itself rather than rely on the visual change.
+      <div
+        role="status"
+        aria-live="polite"
+        className={cn("surface-card p-8 md:p-10", className)}
+      >
         <span className="grid size-11 place-items-center rounded-full bg-accent/15 text-accent">
           <Check className="size-5" aria-hidden />
         </span>
@@ -234,6 +240,7 @@ export function RentalForm({
         variant="accent"
         size="lg"
         disabled={isSubmitting}
+        aria-busy={isSubmitting || undefined}
         className="group mt-2 self-start"
       >
         {isSubmitting ? (
@@ -257,6 +264,14 @@ export function RentalForm({
   );
 }
 
+/**
+ * `children` is always exactly one Input/Select/Textarea — `cloneElement`
+ * injects the id/aria-invalid/aria-describedby wiring onto it here, once,
+ * rather than requiring every one of the twelve call sites above to repeat
+ * it by hand. `<label>` already associates the visible text with the field
+ * natively; what this adds is the error-message association, which wrapping
+ * alone does not provide.
+ */
 function Field({
   label,
   error,
@@ -265,14 +280,29 @@ function Field({
 }: {
   label: string;
   error?: string;
-  children: React.ReactNode;
+  children: ReactElement<{
+    id?: string;
+    "aria-invalid"?: boolean;
+    "aria-describedby"?: string;
+  }>;
   className?: string;
 }) {
+  const id = useId();
+  const errorId = `${id}-error`;
+
   return (
     <label className={cn("flex flex-col gap-2", className)}>
       <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">{label}</span>
-      {children}
-      {error && <span className="text-xs text-negative">{error}</span>}
+      {cloneElement(children, {
+        id,
+        "aria-invalid": error ? true : undefined,
+        "aria-describedby": error ? errorId : undefined,
+      })}
+      {error && (
+        <span id={errorId} role="alert" className="text-xs text-negative">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

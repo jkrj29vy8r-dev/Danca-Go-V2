@@ -1,6 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  cloneElement,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactElement,
+} from "react";
 import Link from "next/link";
 import { useFieldArray, useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -98,47 +106,68 @@ export function BookingFlow({
 
   const activeIndex = STEPS.findIndex((s) => s.id === step);
 
+  // Each step swaps the entire view under the stepper — a screen reader user
+  // who just pressed "Continuă" needs that announced, not left focused on a
+  // button that no longer exists in the DOM. A tabIndex={-1} region that gets
+  // programmatically focused on every step change (but not on first mount,
+  // where it would steal focus from wherever the page itself put it) is the
+  // standard pattern for this: focusing an unlabelled container makes a
+  // screen reader read forward from it, effectively announcing the new
+  // step's heading and content as if the user had navigated there.
+  const stepRegionRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    stepRegionRef.current?.focus();
+  }, [step]);
+
   return (
     <div className="flex flex-col gap-8">
       <Stepper activeIndex={activeIndex} />
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
-          transition={{ duration: 0.45, ease: EASE }}
-        >
-          {step === "passengers" && (
-            <PassengerStep
-              form={form}
-              fields={fields}
-              append={append}
-              remove={remove}
-              maxSeats={maxSeats}
-              unitPrice={trip.price}
-              total={total}
-              onNext={goReview}
-            />
-          )}
+      <div ref={stepRegionRef} tabIndex={-1} className="outline-none">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
+            transition={{ duration: 0.45, ease: EASE }}
+          >
+            {step === "passengers" && (
+              <PassengerStep
+                form={form}
+                fields={fields}
+                append={append}
+                remove={remove}
+                maxSeats={maxSeats}
+                unitPrice={trip.price}
+                total={total}
+                onNext={goReview}
+              />
+            )}
 
-          {step === "review" && (
-            <ReviewStep
-              trip={trip}
-              values={values}
-              total={total}
-              submitting={form.formState.isSubmitting}
-              onBack={() => setStep("passengers")}
-              onConfirm={submit}
-            />
-          )}
+            {step === "review" && (
+              <ReviewStep
+                trip={trip}
+                values={values}
+                total={total}
+                submitting={form.formState.isSubmitting}
+                onBack={() => setStep("passengers")}
+                onConfirm={submit}
+              />
+            )}
 
-          {step === "done" && confirmation && (
-            <ConfirmationStep trip={trip} confirmation={confirmation} seats={fields.length} />
-          )}
-        </motion.div>
-      </AnimatePresence>
+            {step === "done" && confirmation && (
+              <ConfirmationStep trip={trip} confirmation={confirmation} seats={fields.length} />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -261,6 +290,12 @@ function PassengerStep({
                     placeholder="Nume și prenume"
                     autoComplete={index === 0 ? "name" : "off"}
                     aria-label={`Nume pasager ${index + 1}`}
+                    aria-invalid={errors.passengers?.[index]?.full_name ? true : undefined}
+                    aria-describedby={
+                      errors.passengers?.[index]?.full_name
+                        ? `passenger-${index}-error`
+                        : undefined
+                    }
                     className="flex-1"
                   />
 
@@ -281,7 +316,7 @@ function PassengerStep({
                 </div>
 
                 {errors.passengers?.[index]?.full_name && (
-                  <p className="mt-2 text-xs text-negative">
+                  <p id={`passenger-${index}-error`} role="alert" className="mt-2 text-xs text-negative">
                     {errors.passengers[index]?.full_name?.message}
                   </p>
                 )}
@@ -436,6 +471,7 @@ function ReviewStep({
             size="lg"
             onClick={onConfirm}
             disabled={submitting}
+            aria-busy={submitting || undefined}
             className="group"
           >
             {submitting ? (
@@ -548,6 +584,7 @@ function ConfirmationStep({
 
 /* -------------------------------------------------------------------------- */
 
+/** Same wiring as `rental-form.tsx`'s `Field` — see the comment there. */
 function Field({
   label,
   error,
@@ -556,14 +593,29 @@ function Field({
 }: {
   label: string;
   error?: string;
-  children: React.ReactNode;
+  children: ReactElement<{
+    id?: string;
+    "aria-invalid"?: boolean;
+    "aria-describedby"?: string;
+  }>;
   className?: string;
 }) {
+  const id = useId();
+  const errorId = `${id}-error`;
+
   return (
     <label className={cn("flex flex-col gap-2", className)}>
       <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">{label}</span>
-      {children}
-      {error && <span className="text-xs text-negative">{error}</span>}
+      {cloneElement(children, {
+        id,
+        "aria-invalid": error ? true : undefined,
+        "aria-describedby": error ? errorId : undefined,
+      })}
+      {error && (
+        <span id={errorId} role="alert" className="text-xs text-negative">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

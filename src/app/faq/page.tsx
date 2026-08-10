@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Mail, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { FaqBrowser } from "@/components/faq/faq-browser";
@@ -8,20 +7,26 @@ import { ScaleIn } from "@/components/motion/scroll-effects";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
 import { phoneDisplay, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/faq",
   title: "Întrebări frecvente",
   description:
     "Răspunsuri clare despre rezervări, bagaje, transfer aeroport, plată și închirieri de autocare la Danca Go.",
-  alternates: { canonical: "/faq" },
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Întrebări frecvente", path: "/faq" },
+]);
 
 export default function FaqPage() {
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumb, faqJsonLd()]) }}
       />
 
       <PageHeader

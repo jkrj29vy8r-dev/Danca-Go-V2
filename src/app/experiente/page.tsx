@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { ArrowRight, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { RentalForm } from "@/components/rentals/rental-form";
@@ -9,12 +8,19 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
 import { experienceExamples, formatCount, phoneDisplay, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/experiente",
   title: "Experiențe și excursii la cerere",
   description:
     "Organizăm transportul pentru ieșiri de o zi, deplasări de echipă și evenimente. Tu alegi traseul, noi ne ocupăm de drum.",
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Experiențe", path: "/experiente" },
+]);
 
 /**
  * Custom day trips.
@@ -26,6 +32,11 @@ export const metadata: Metadata = {
 export default function ExperiencesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="La cerere"
         title="Tu alegi traseul. Noi ducem grupul."

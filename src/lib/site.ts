@@ -54,6 +54,27 @@ export const site = {
 } as const;
 
 /**
+ * Phone hours, as published on the contact page. Kept here rather than
+ * hardcoded into that page's JSX so the root layout's business structured
+ * data (`openingHoursSpecification`) can't drift out of sync with what's
+ * actually displayed to a visitor.
+ */
+export const openingHours = [
+  {
+    label: "Luni — Vineri",
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "07:00",
+    closes: "21:00",
+  },
+  {
+    label: "Sâmbătă — Duminică",
+    days: ["Saturday", "Sunday"],
+    opens: "08:00",
+    closes: "20:00",
+  },
+] as const;
+
+/**
  * Registration details the law requires a trader to publish (OUG 34/2014 and
  * Legea 365/2002 for distance selling; Regulamentul (UE) 2016/679 for the data
  * controller identity).
@@ -243,6 +264,18 @@ export const featuredRoutes: FeaturedRoute[] = [
     hub: "constanta",
   },
 ];
+
+/**
+ * "110–150 RON" — derived from the live fares rather than a separately
+ * maintained number, so the business structured data's `priceRange` can
+ * never quote a bracket the site itself no longer charges.
+ */
+export const priceRange = (() => {
+  const fares = featuredRoutes.map((route) => route.fromPrice);
+  const min = Math.min(...fares) / 100;
+  const max = Math.max(...fares) / 100;
+  return `${min}–${max} RON`;
+})();
 
 /** Regional pickup points served along the main corridors. */
 export const regionalStops = ["Adjud", "Focșani", "Buzău", "Onești"] as const;

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { ArrowRight, Check } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
@@ -8,16 +7,28 @@ import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
 import { ButtonLink } from "@/components/ui/button";
 import { VehicleGallery } from "@/components/fleet/vehicle-gallery";
 import { fleet, fleetNote } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Flota",
   description:
     "Un autocar Setra, mai multe microbuze Mercedes-Benz Sprinter de la 12 locuri și un Mercedes-Benz Vito — întreținute obsesiv și verificate înainte de fiecare cursă lungă.",
-};
+  path: "/flota",
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Flota", path: "/flota" },
+]);
 
 export default function FleetPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Flota"
         title="Vehicule pe care te poți baza."

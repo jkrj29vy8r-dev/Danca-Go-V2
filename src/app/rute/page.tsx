@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight, Clock } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -7,13 +6,20 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { WordsUp } from "@/components/motion/text-reveal";
 import { TiltCard } from "@/components/motion/magnetic";
 import { featuredRoutes } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Rute",
   description:
     "Toate rutele Danca Go: Târgu Neamț, Piatra Neamț, Roman și Bacău către București, Otopeni și Constanța.",
-};
+  path: "/rute",
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Rute", path: "/rute" },
+]);
 
 const hubs = [
   { key: "bucuresti", label: "Spre București" },
@@ -24,6 +30,11 @@ const hubs = [
 export default function RoutesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Rețeaua"
         title="Toate rutele noastre."

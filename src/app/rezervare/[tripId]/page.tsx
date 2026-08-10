@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Clock, Users } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
@@ -7,12 +6,19 @@ import { Reveal } from "@/components/motion/reveal";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { TripSearchResult } from "@/lib/types/database";
+import { pageMetadata } from "@/lib/seo";
 import { formatDateRo, formatDuration, formatPrice, formatTime } from "@/lib/utils";
 
-export const metadata: Metadata = {
+/**
+ * Not `generateMetadata`: the trip row is fetched once, by the page body
+ * below, and a per-trip title isn't worth a second Supabase round-trip on a
+ * route that's already noindexed and never meant to be linked externally.
+ */
+export const metadata = pageMetadata({
   title: "Finalizează rezervarea",
-  robots: { index: false, follow: false },
-};
+  description: "Ultimul pas al rezervării: datele pasagerilor și confirmarea locului.",
+  noIndex: true,
+});
 
 export const dynamic = "force-dynamic";
 

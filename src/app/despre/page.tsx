@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ReadThrough, WordsUp } from "@/components/motion/text-reveal";
@@ -6,16 +5,28 @@ import { Magnetic } from "@/components/motion/magnetic";
 import { CountUp } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, promises, site, stats } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/despre",
   title: "Despre noi",
   description:
     "Danca Util Ideal SRL transportă pasageri din 2019 între Moldova, București, Otopeni și Constanța. Povestea, standardele și oamenii din spatele Danca Go.",
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Despre noi", path: "/despre" },
+]);
 
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Despre noi"
         title={`Din ${site.founded}, pe același drum.`}

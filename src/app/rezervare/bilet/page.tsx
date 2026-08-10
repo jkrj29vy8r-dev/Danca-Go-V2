@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { BookingLookup } from "@/components/booking/booking-lookup";
 import { Reveal } from "@/components/motion/reveal";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/rezervare/bilet",
   title: "Găsește-ți rezervarea",
   description:
     "Caută o rezervare Danca Go după codul primit și adresa de email folosită la rezervare.",
-  robots: { index: false, follow: false },
-};
+  noIndex: true,
+});
 
 export default function BookingLookupPage() {
   return (

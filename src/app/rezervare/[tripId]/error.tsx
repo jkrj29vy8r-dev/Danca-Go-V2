@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { RotateCcw } from "lucide-react";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { phoneDisplay, site } from "@/lib/site";
 
@@ -37,9 +37,10 @@ export default function BookingError({
           <RotateCcw className="size-4" aria-hidden />
           Încearcă din nou
         </Button>
-        <ButtonLink href={`tel:${site.phones[0]}`} variant="secondary" size="lg">
-          {phoneDisplay(site.phones[0])}
-        </ButtonLink>
+        {/* Plain anchor: `tel:` is a protocol handler, not a route. */}
+        <Button asChild variant="secondary" size="lg">
+          <a href={`tel:${site.phones[0]}`}>{phoneDisplay(site.phones[0])}</a>
+        </Button>
       </div>
     </section>
   );

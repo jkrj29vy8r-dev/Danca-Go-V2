@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check, Clock, PlaneTakeoff } from "lucide-react";
@@ -12,18 +11,26 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
 import { featuredRoutes } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/servicii/transfer-aeroport",
   title: "Transfer aeroport Otopeni",
   description:
     "Transfer către Aeroportul Henri Coandă din Târgu Neamț, Piatra Neamț, Roman și Bacău. Curse regulate cu loc rezervat sau transfer privat, ușă la ușă, corelat cu ora zborului.",
-  alternates: { canonical: "/servicii/transfer-aeroport" },
-};
+});
 
 const airportRoutes = featuredRoutes.filter((route) => route.hub === "otopeni");
 
 const airportFaq = faqGroups.find((group) => group.id === "aeroport");
+
+// Flat trail, not "Acasă → Servicii → Transfer aeroport": there's no /servicii
+// index page, and a breadcrumb step should always be a URL that resolves.
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Transfer aeroport", path: "/servicii/transfer-aeroport" },
+]);
 
 /** The honest comparison: two different services, not one with an upsell. */
 const options = [
@@ -77,12 +84,14 @@ const steps = [
 export default function AirportTransferPage() {
   return (
     <>
-      {airportFaq && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(airportFaq.items)) }}
-        />
-      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            airportFaq ? [breadcrumb, faqJsonLd(airportFaq.items)] : breadcrumb,
+          ),
+        }}
+      />
 
       <PageHeader
         eyebrow="Serviciu"

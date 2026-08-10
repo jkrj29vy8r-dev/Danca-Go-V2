@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -6,16 +5,28 @@ import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { TiltCard, Spotlight } from "@/components/motion/magnetic";
 import { WordsUp } from "@/components/motion/text-reveal";
 import { ScaleIn } from "@/components/motion/scroll-effects";
-import { phoneDisplay, site } from "@/lib/site";
+import { openingHours, phoneDisplay, site } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/contact",
   title: "Contact",
   description: `Sună-ne la ${phoneDisplay(site.phones[0])} sau scrie-ne la ${site.email}. Răspundem șapte zile din șapte.`,
-};
+});
+
+const breadcrumb = breadcrumbJsonLd([
+  { name: "Acasă", path: "/" },
+  { name: "Contact", path: "/contact" },
+]);
 
 export default function ContactPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+
       <PageHeader
         eyebrow="Contact"
         title="Vorbim direct."
@@ -78,14 +89,17 @@ export default function ContactPage() {
             <div>
               <h2 className="text-title text-ink">Program</h2>
               <dl className="mt-4 flex flex-col gap-2 text-ink-muted">
-                <div className="flex justify-between gap-4 border-b border-hairline pb-2">
-                  <dt>Luni — Vineri</dt>
-                  <dd className="tabular-nums text-ink">07:00 — 21:00</dd>
-                </div>
-                <div className="flex justify-between gap-4 border-b border-hairline pb-2">
-                  <dt>Sâmbătă — Duminică</dt>
-                  <dd className="tabular-nums text-ink">08:00 — 20:00</dd>
-                </div>
+                {openingHours.map((hours) => (
+                  <div
+                    key={hours.label}
+                    className="flex justify-between gap-4 border-b border-hairline pb-2"
+                  >
+                    <dt>{hours.label}</dt>
+                    <dd className="tabular-nums text-ink">
+                      {hours.opens} — {hours.closes}
+                    </dd>
+                  </div>
+                ))}
                 <div className="flex justify-between gap-4">
                   <dt>Urgențe cursă</dt>
                   <dd className="text-ink">Non-stop</dd>
