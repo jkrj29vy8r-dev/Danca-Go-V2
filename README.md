@@ -361,9 +361,14 @@ files must agree; a FAQ that contradicts the terms is worse than no FAQ.
 ## Fleet photography
 
 Real photography lives in `/public/fleet`, processed to 16:10 at 1600×1000
-(~160–250 KB each) plus an 800×500 variant. `VehiclePhoto` renders the primary
-shot and `VehicleGallery` adds the rest; a vehicle with no `image` still
-renders correctly via a designed placeholder.
+(~160–250 KB each). `VehiclePhoto` renders the primary shot and
+`VehicleGallery` adds the rest; a vehicle with no `image` still renders
+correctly via a designed placeholder.
+
+An earlier pass also wrote hand-made `@sm` 800×500 copies. Nothing ever
+referenced them — `next/image` derives its own responsive variants from the
+source file — so they were 772 KB of dead weight and have been deleted. Don't
+reintroduce them.
 
 Two rules learned the hard way:
 
