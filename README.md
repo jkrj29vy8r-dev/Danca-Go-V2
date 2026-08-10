@@ -23,8 +23,13 @@ crashing. Add the keys to enable search, booking and rental enquiries.
 ```bash
 # Against a Supabase project (or `supabase db reset` locally)
 psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
+psql "$DATABASE_URL" -f supabase/migrations/0002_payments_and_holds.sql
 psql "$DATABASE_URL" -f supabase/seed.sql          # optional demo data
 ```
+
+Both migrations and the seed were applied to a real PostgreSQL 16 instance and
+the booking functions exercised end to end — seat accounting, oversell
+rejection, hold expiry, payment idempotency and privilege boundaries.
 
 Regenerate types after any schema change:
 
@@ -163,6 +168,28 @@ full-bleed bar with fields divided by hairlines, so it reads as page
 architecture the coach is standing on rather than a card that happened to land
 over the artwork. The same component renders as a raised card on `/rezervare`
 via a `variant` prop.
+
+### Booking flow
+
+Search (`/rezervare`) → checkout (`/rezervare/[tripId]`) → retrieval
+(`/rezervare/bilet`). Checkout is three steps — passengers, review,
+confirmation — held in a single client component with one form. Splitting it
+across routes would mean a server round-trip per step or stashing
+half-finished passenger data somewhere; keeping it local makes Back free and
+writes nothing until the customer confirms.
+
+**Seats are held, not hoarded.** A `pending` booking used to hold its seats
+forever, so an abandoned checkout permanently removed inventory.
+`book_trip` now stamps `hold_expires_at` (30 min) and calls
+`release_expired_holds()` before checking availability, so seats freed a
+second ago are immediately sellable. Paid bookings are never released.
+
+**Payments are seamed, not stubbed.** `lib/payments.ts` defines the gateway
+interface and today returns the pay-on-boarding implementation. The database
+side is already Stripe-shaped: amounts are integers in bani (exactly Stripe's
+`amount`), `currency` defaults to RON, `payment_reference` is uniquely indexed
+for a PaymentIntent id, and `confirm_booking_payment()` is idempotent and
+granted to `service_role` alone — a webhook replay cannot double-confirm.
 
 **Seat inventory is enforced in Postgres.** `book_trip()` locks the trip row,
 validates availability, decrements inventory and writes the booking in one

@@ -31,18 +31,61 @@ export const rentalSchema = z
 
 export type RentalInput = z.infer<typeof rentalSchema>;
 
-export const bookingSchema = z.object({
-  trip_id: z.uuid(),
+/* -------------------------------------------------------------------------- */
+/*                                   BOOKING                                   */
+/* -------------------------------------------------------------------------- */
+
+const phone = z
+  .string()
+  .trim()
+  .min(9, "Număr de telefon invalid")
+  .max(24)
+  .regex(/^[+0-9 ().-]+$/, "Număr de telefon invalid");
+
+/**
+ * One row per seat. The name is what the driver checks against the manifest,
+ * so it's required for every passenger, not just the person paying.
+ */
+export const passengerSchema = z.object({
+  full_name: z.string().trim().min(3, "Introdu numele complet").max(120),
+  // No .default() — a default makes the schema's input and output types differ,
+  // which react-hook-form's resolver cannot reconcile. The form always supplies
+  // this field, so the flag is simply required.
+  is_child: z.boolean(),
+});
+
+export type PassengerInput = z.infer<typeof passengerSchema>;
+
+/** Step 2 of the flow: who is travelling and who to contact. */
+export const passengerDetailsSchema = z.object({
   contact_name: z.string().trim().min(3, "Introdu numele complet").max(120),
   contact_email: z.email("Adresă de email invalidă").max(160),
-  contact_phone: z
-    .string()
-    .trim()
-    .min(9, "Număr de telefon invalid")
-    .max(24)
-    .regex(/^[+0-9 ().-]+$/, "Număr de telefon invalid"),
-  seat_count: z.number().int().min(1).max(20),
+  contact_phone: phone,
+  passengers: z
+    .array(passengerSchema)
+    .min(1, "Cel puțin un pasager")
+    .max(20, "Pentru grupuri mai mari, sună-ne direct"),
   notes: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
+export type PassengerDetailsInput = z.infer<typeof passengerDetailsSchema>;
+
+/** What the Server Action receives once the user confirms. */
+export const bookingSchema = passengerDetailsSchema.extend({
+  trip_id: z.uuid(),
+});
+
 export type BookingInput = z.infer<typeof bookingSchema>;
+
+/** Retrieving an existing booking: reference + email act as the shared secret. */
+export const bookingLookupSchema = z.object({
+  booking_ref: z
+    .string()
+    .trim()
+    .min(5, "Codul rezervării are formatul DG-XXXXXXX")
+    .max(16)
+    .transform((value) => value.toUpperCase()),
+  contact_email: z.email("Adresă de email invalidă").max(160),
+});
+
+export type BookingLookupInput = z.infer<typeof bookingLookupSchema>;

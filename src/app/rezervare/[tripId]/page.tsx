@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Clock, Users } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
-import { BookingForm } from "@/components/booking/booking-form";
+import { BookingFlow } from "@/components/booking/booking-flow";
 import { Reveal } from "@/components/motion/reveal";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -98,12 +98,7 @@ export default async function CheckoutPage({
         </Reveal>
 
         <Reveal delay={0.1}>
-          <BookingForm
-            tripId={trip.id}
-            seatCount={requestedSeats}
-            unitPrice={trip.price}
-            maxSeats={trip.seats_available}
-          />
+          <BookingFlow trip={trip} initialSeats={requestedSeats} />
         </Reveal>
       </div>
     </>

@@ -113,6 +113,12 @@ export type Booking = {
   pickup_stop_id: string | null;
   dropoff_stop_id: string | null;
   notes: string | null;
+  currency: string;
+  payment_provider: string | null;
+  payment_reference: string | null;
+  paid_at: string | null;
+  /** While pending, seats are held until this instant. */
+  hold_expires_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -195,11 +201,33 @@ export interface Database {
           p_contact_name: string;
           p_contact_email: string;
           p_contact_phone: string;
-          p_passengers?: { full_name: string; seat_label?: string; is_child?: boolean }[];
+          p_passengers?: { full_name: string; seat_label?: string | null; is_child?: boolean }[];
           p_seat_count?: number;
           p_notes?: string | null;
+          p_hold_minutes?: number;
         };
         Returns: Booking;
+      };
+      release_expired_holds: {
+        Args: { p_trip_id?: string | null };
+        Returns: number;
+      };
+      confirm_booking_payment: {
+        Args: {
+          p_booking_ref: string;
+          p_provider: string;
+          p_reference?: string | null;
+          p_amount?: number | null;
+        };
+        Returns: Booking;
+      };
+      get_booking_details: {
+        Args: { p_booking_ref: string; p_contact_email: string };
+        Returns: {
+          booking: Booking;
+          trip: TripSearchResult;
+          passengers: BookingPassenger[];
+        } | null;
       };
       cancel_booking: {
         Args: { p_booking_ref: string; p_contact_email: string };

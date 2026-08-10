@@ -56,6 +56,7 @@ export const footerNav = [
       { label: "Piatra Neamț — Otopeni", href: "/rute/piatra-neamt-otopeni" },
       { label: "Roman — Constanța", href: "/rute/roman-constanta" },
       { label: "Rezervă un bilet", href: "/rezervare" },
+      { label: "Găsește-ți rezervarea", href: "/rezervare/bilet" },
     ],
   },
   {
