@@ -24,6 +24,7 @@ crashing. Add the keys to enable search, booking and rental enquiries.
 # Against a Supabase project (or `supabase db reset` locally)
 psql "$DATABASE_URL" -f supabase/migrations/0001_init.sql
 psql "$DATABASE_URL" -f supabase/migrations/0002_payments_and_holds.sql
+psql "$DATABASE_URL" -f supabase/migrations/0003_rental_requests.sql
 psql "$DATABASE_URL" -f supabase/seed.sql          # optional demo data
 ```
 
@@ -57,7 +58,8 @@ src/
 │   ├── page.tsx                Homepage
 │   ├── rezervare/              Search results → [tripId] checkout
 │   ├── rute/ flota/ despre/ contact/
-│   └── inchirieri/             Charter enquiry + Server Action
+│   ├── inchirieri/             Coach hire + quote Server Action
+│   └── experiente/             Custom day trips (shares the quote form)
 ├── components/
 │   ├── ui/                     Design-system primitives (Button, Card, Eyebrow)
 │   ├── layout/                 Navbar, Footer, PageHeader, Logo
@@ -190,6 +192,12 @@ side is already Stripe-shaped: amounts are integers in bani (exactly Stripe's
 `amount`), `currency` defaults to RON, `payment_reference` is uniquely indexed
 for a PaymentIntent id, and `confirm_booking_payment()` is idempotent and
 granted to `service_role` alone — a webhook replay cannot double-confirm.
+
+**Both quote pages share one form and one table.** `/inchirieri` and
+`/experiente` ask the same operational questions — when, from where, how many —
+so they share `RentalForm` and the `rentals` table. A `kind` column records
+which page produced the row and drives the labels, so staff opening a request
+know whether it's a coach hire or a day trip without reading the message.
 
 **Seat inventory is enforced in Postgres.** `book_trip()` locks the trip row,
 validates availability, decrements inventory and writes the booking in one

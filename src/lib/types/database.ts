@@ -10,6 +10,7 @@ export type TripStatus = "scheduled" | "boarding" | "departed" | "arrived" | "ca
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "refunded" | "completed";
 export type PaymentStatus = "unpaid" | "paid" | "refunded" | "failed";
 export type RentalStatus = "new" | "contacted" | "quoted" | "won" | "lost";
+export type RequestKind = "rental" | "experience";
 
 export type City = {
   id: string;
@@ -149,6 +150,9 @@ export type Rental = {
   message: string | null;
   status: RentalStatus;
   quoted_price: number | null;
+  kind: RequestKind;
+  event_type: string | null;
+  flexible_dates: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -247,6 +251,7 @@ export interface Database {
       booking_status: BookingStatus;
       payment_status: PaymentStatus;
       rental_status: RentalStatus;
+      request_kind: RequestKind;
     };
     CompositeTypes: Record<never, never>;
   };

@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+/** Which page the request came from — they ask different questions. */
+export const requestKindSchema = z.enum(["rental", "experience"]);
+export type RequestKindInput = z.infer<typeof requestKindSchema>;
+
 /** Shared between the client form and the Server Action. */
 export const rentalSchema = z
   .object({
@@ -22,6 +26,9 @@ export const rentalSchema = z
       .min(1, "Minim 1 pasager")
       .max(90, "Pentru grupuri mai mari, sună-ne direct"),
     vehicle_class: z.enum(["coach", "minibus"]).optional().or(z.literal("")),
+    event_type: z.string().trim().max(80).optional().or(z.literal("")),
+    flexible_dates: z.boolean(),
+    kind: requestKindSchema,
     message: z.string().trim().max(2000).optional().or(z.literal("")),
   })
   .refine(

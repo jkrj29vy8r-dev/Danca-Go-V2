@@ -43,6 +43,7 @@ export const navigation = [
   { label: "Rute", href: "/rute" },
   { label: "Flota", href: "/flota" },
   { label: "Închirieri", href: "/inchirieri" },
+  { label: "Experiențe", href: "/experiente" },
   { label: "Despre noi", href: "/despre" },
   { label: "Contact", href: "/contact" },
 ] as const;
@@ -66,7 +67,7 @@ export const footerNav = [
       { label: "Închirieri autocare", href: "/inchirieri" },
       { label: "Închirieri microbuze", href: "/inchirieri" },
       { label: "Transfer aeroport", href: "/servicii/transfer-aeroport" },
-      { label: "Excursii de o zi", href: "/servicii/excursii" },
+      { label: "Experiențe la cerere", href: "/experiente" },
     ],
   },
   {
@@ -358,8 +359,80 @@ export const services = [
     slug: "experiente",
     title: "Excursii de o zi, la cerere",
     body: "Organizăm transportul pentru ieșiri de o zi și deplasări personalizate. Tu alegi traseul, noi ne ocupăm de drum.",
-    href: "/inchirieri",
+    href: "/experiente",
     cta: "Spune-ne planul",
+  },
+];
+
+/* -------------------------------------------------------------------------- */
+/*                          RENTALS & CUSTOM EXPERIENCES                       */
+/* -------------------------------------------------------------------------- */
+
+/** Occasion options per form. Free-form in the database; these are prompts. */
+export const eventTypes = {
+  rental: [
+    "Transport corporate",
+    "Echipă sportivă",
+    "Nuntă sau eveniment privat",
+    "Grup școlar",
+    "Transfer aeroport",
+    "Altceva",
+  ],
+  experience: [
+    "Excursie de o zi",
+    "Ieșire de echipă",
+    "Pelerinaj",
+    "Eveniment sportiv sau concert",
+    "Ieșire în familie",
+    "Altceva",
+  ],
+} as const;
+
+/** Why hire from an operator rather than the cheapest bus on the market. */
+export const rentalBenefits = [
+  {
+    title: "Șoferi profesioniști",
+    body: "Atestat profesional, timpi de odihnă respectați și instruire periodică. Oameni obișnuiți cu drumurile lungi și cu grupurile.",
+  },
+  {
+    title: "Confort pe distanțe mari",
+    body: "Climatizare, scaune rabatabile și spațiu real pentru bagaje. Ajungeți odihniți, nu doar ajungeți.",
+  },
+  {
+    title: "Flexibilitate pe traseu",
+    body: "Tu stabilești plecarea, opririle și ora de întoarcere. Nu ne încadrăm noi în orarul unei curse regulate.",
+  },
+  {
+    title: "Ofertă în 24 de ore",
+    body: "Preț ferm, în scris, cu tot ce include. Fără costuri care apar la final și fără negocieri la plecare.",
+  },
+];
+
+/** What people actually hire us for. Transport for the occasion — not a package. */
+export const experienceExamples = [
+  {
+    title: "Ieșiri de echipă",
+    body: "Transport dus-întors pentru colegi, cu plecare de la sediu și întoarcere la ora pe care o stabiliți voi.",
+  },
+  {
+    title: "Excursii de o zi",
+    body: "Mănăstiri, munte sau litoral. Voi alegeți traseul și opririle, noi ne ocupăm de drum și de program.",
+  },
+  {
+    title: "Transfer aeroport pentru grup",
+    body: "Preluare de la o singură adresă și transfer direct la Otopeni, corelat cu ora zborului.",
+  },
+  {
+    title: "Evenimente și concerte",
+    body: "Ducem grupul la eveniment și îl așteptăm până se termină, oricât durează.",
+  },
+  {
+    title: "Nunți și evenimente private",
+    body: "Transport pentru invitați între locații, cu program corelat cu al vostru.",
+  },
+  {
+    title: "Grupuri școlare",
+    body: "Deplasări pentru clase și cluburi, cu documentele și asigurările în regulă.",
   },
 ];
 

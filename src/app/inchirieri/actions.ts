@@ -32,7 +32,8 @@ export async function submitRental(input: RentalInput): Promise<RentalResult> {
   }
 
   const data = parsed.data;
-  const reference = generateBookingRef().replace("DG-", "RENT-");
+  const prefix = data.kind === "experience" ? "EXP-" : "RENT-";
+  const reference = generateBookingRef().replace("DG-", prefix);
 
   try {
     const supabase = await createClient();
@@ -54,6 +55,9 @@ export async function submitRental(input: RentalInput): Promise<RentalResult> {
       passenger_count: data.passenger_count,
       vehicle_class: data.vehicle_class || null,
       message: data.message || null,
+      kind: data.kind,
+      event_type: data.event_type || null,
+      flexible_dates: data.flexible_dates,
     });
 
     if (error) {
