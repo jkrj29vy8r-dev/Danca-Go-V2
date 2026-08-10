@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
-import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { TiltCard, Spotlight } from "@/components/motion/magnetic";
+import { WordsUp } from "@/components/motion/text-reveal";
+import { ScaleIn } from "@/components/motion/scroll-effects";
 import { phoneDisplay, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -23,9 +26,10 @@ export default function ContactPage() {
         <RevealGroup className="grid gap-4 md:grid-cols-3">
           {site.phones.map((phone, index) => (
             <RevealItem key={phone}>
-              <Card className="h-full">
+              <TiltCard maxTilt={5} className="h-full">
+              <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
                 <a href={`tel:${phone}`} className="flex h-full flex-col gap-6 p-8">
-                  <Phone className="size-5 text-accent" aria-hidden />
+                  <Phone className="size-5 text-accent transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/tilt:-rotate-12" aria-hidden />
                   <span>
                     <span className="block text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
                       {index === 0 ? "Rezervări" : "Închirieri & grupuri"}
@@ -36,13 +40,15 @@ export default function ContactPage() {
                   </span>
                 </a>
               </Card>
+              </TiltCard>
             </RevealItem>
           ))}
 
           <RevealItem>
-            <Card className="h-full">
+            <TiltCard maxTilt={5} className="h-full">
+            <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
               <a href={`mailto:${site.email}`} className="flex h-full flex-col gap-6 p-8">
-                <Mail className="size-5 text-accent" aria-hidden />
+                <Mail className="size-5 text-accent transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/tilt:-translate-y-0.5" aria-hidden />
                 <span>
                   <span className="block text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
                     Email
@@ -51,15 +57,16 @@ export default function ContactPage() {
                 </span>
               </a>
             </Card>
+            </TiltCard>
           </RevealItem>
         </RevealGroup>
 
-        <Reveal className="mt-16">
-          <div className="surface-card grid gap-10 p-8 md:grid-cols-2 md:p-12">
+        <ScaleIn className="mt-16">
+          <Spotlight className="surface-card grid gap-10 overflow-hidden p-8 md:grid-cols-2 md:p-12" size={560}>
             <div>
               <h2 className="flex items-center gap-2.5 text-title text-ink">
                 <MapPin className="size-4 text-accent" aria-hidden />
-                Sediul
+                <WordsUp>Sediul</WordsUp>
               </h2>
               <p className="mt-4 leading-relaxed text-ink-muted">
                 {site.legalName}
@@ -85,8 +92,8 @@ export default function ContactPage() {
                 </div>
               </dl>
             </div>
-          </div>
-        </Reveal>
+          </Spotlight>
+        </ScaleIn>
       </section>
     </>
   );

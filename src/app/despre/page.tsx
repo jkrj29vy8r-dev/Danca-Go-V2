@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { ReadThrough, WordsUp } from "@/components/motion/text-reveal";
+import { Magnetic } from "@/components/motion/magnetic";
+import { CountUp } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, promises, site, stats } from "@/lib/site";
 
@@ -17,6 +20,7 @@ export default function AboutPage() {
         eyebrow="Despre noi"
         title={`Din ${site.founded}, pe același drum.`}
         lead="Am început cu un singur vehicul și o rută. Astăzi conectăm zece orașe, cu aceeași obsesie pentru punctualitate cu care am plecat la drum."
+        scene="ambient"
       />
 
       <section className="container-page pb-24">
@@ -25,7 +29,11 @@ export default function AboutPage() {
             <RevealItem key={stat.label}>
               <div className="flex h-full flex-col gap-3 bg-surface p-8 md:p-10">
                 <span className="text-[2.5rem] font-semibold leading-none tracking-[-0.04em] tabular-nums text-ink">
-                  {stat.value}
+                  <CountUp
+                    value={stat.value}
+                    decimals={stat.decimals}
+                    suffix={stat.valueSuffix}
+                  />
                   {stat.suffix && (
                     <span className="ml-1.5 text-lg font-normal tracking-normal text-ink-dim">
                       {stat.suffix}
@@ -43,7 +51,7 @@ export default function AboutPage() {
         <div className="grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
           <Reveal>
             <h2 className="text-headline text-gradient">
-              O companie de familie, cu standarde de corporație.
+              <WordsUp>O companie de familie, cu standarde de corporație.</WordsUp>
             </h2>
           </Reveal>
 
@@ -62,18 +70,18 @@ export default function AboutPage() {
               Suntem licențiați ARR, cu toate autorizațiile de transport rutier
               de persoane la zi.
             </p>
-            <p>
-              Rating-ul nostru de {site.rating.score}/{site.rating.max}, strâns
-              de la peste {formatCount(site.rating.count)} de pasageri, nu vine din marketing.
-              Vine din faptul că plecăm la ora anunțată.
-            </p>
+            <ReadThrough>
+              {`Rating-ul nostru de ${site.rating.score}/${site.rating.max}, strâns de la peste ${formatCount(site.rating.count)} de pasageri, nu vine din marketing. Vine din faptul că plecăm la ora anunțată.`}
+            </ReadThrough>
           </Reveal>
         </div>
       </section>
 
       <section className="container-page pb-28">
         <Reveal>
-          <h2 className="text-title text-ink">Ce garantăm, de fiecare dată</h2>
+          <h2 className="text-title text-ink">
+            <WordsUp>Ce garantăm, de fiecare dată</WordsUp>
+          </h2>
         </Reveal>
 
         <RevealGroup className="mt-10 grid gap-x-12 gap-y-12 sm:grid-cols-2">
@@ -91,9 +99,11 @@ export default function AboutPage() {
         </RevealGroup>
 
         <Reveal className="mt-16">
-          <ButtonLink href="/contact" variant="secondary" size="lg">
-            Vorbește cu noi
-          </ButtonLink>
+          <Magnetic strength={0.2}>
+            <ButtonLink href="/contact" variant="secondary" size="lg">
+              Vorbește cu noi
+            </ButtonLink>
+          </Magnetic>
         </Reveal>
       </section>
     </>

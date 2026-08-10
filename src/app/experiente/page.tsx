@@ -3,9 +3,11 @@ import { ArrowRight, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { RentalForm } from "@/components/rentals/rental-form";
 import { Card } from "@/components/ui/card";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { Magnetic, TiltCard } from "@/components/motion/magnetic";
+import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
 import { experienceExamples, formatCount, phoneDisplay, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -28,16 +30,29 @@ export default function ExperiencesPage() {
         eyebrow="La cerere"
         title="Tu alegi traseul. Noi ducem grupul."
         lead="Organizăm transportul pentru ieșiri de o zi, deplasări de echipă și evenimente. Nu vindem pachete turistice — punem la dispoziție vehiculul, șoferul și un program făcut după al vostru."
+        scene="ambient"
       >
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href="#oferta" variant="accent" size="lg" className="group">
-            Solicită ofertă
-            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </ButtonLink>
-          <ButtonLink href={`tel:${site.phones[0]}`} variant="secondary" size="lg">
-            <Phone className="size-4" aria-hidden />
-            <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
-          </ButtonLink>
+          <Magnetic strength={0.22} className="w-full sm:w-auto">
+            <ButtonLink
+              href="#oferta"
+              variant="accent"
+              size="lg"
+              className="group w-full sm:w-auto"
+            >
+              Solicită ofertă
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </ButtonLink>
+          </Magnetic>
+
+          {/* Plain anchor: `tel:` is a protocol handler, not a route for the
+              client router to prefetch. */}
+          <Button asChild variant="secondary" size="lg">
+            <a href={`tel:${site.phones[0]}`}>
+              <Phone className="size-4" aria-hidden />
+              <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
+            </a>
+          </Button>
         </div>
       </PageHeader>
 
@@ -72,7 +87,7 @@ export default function ExperiencesPage() {
           <Reveal className="max-w-2xl">
             <Eyebrow>Pentru ce ne sună lumea</Eyebrow>
             <h2 className="mt-6 text-headline text-gradient">
-              Orice grup, orice traseu, orice oră.
+              <WordsUp>Orice grup, orice traseu, orice oră.</WordsUp>
             </h2>
             <p className="mt-5 text-body-lg text-ink-muted">
               Astea sunt cele mai frecvente. Dacă planul tău nu seamănă cu
@@ -83,7 +98,8 @@ export default function ExperiencesPage() {
           <RevealGroup className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {experienceExamples.map((example, index) => (
               <RevealItem key={example.title}>
-                <Card className="h-full">
+                <TiltCard maxTilt={4} className="h-full">
+                <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
                   <article className="flex h-full flex-col gap-4 p-7">
                     <span className="text-sm tabular-nums text-accent">
                       {String(index + 1).padStart(2, "0")}
@@ -92,6 +108,7 @@ export default function ExperiencesPage() {
                     <p className="leading-relaxed text-ink-muted">{example.body}</p>
                   </article>
                 </Card>
+                </TiltCard>
               </RevealItem>
             ))}
           </RevealGroup>
@@ -103,7 +120,9 @@ export default function ExperiencesPage() {
         <div className="container-page py-28">
           <Reveal className="max-w-2xl">
             <Eyebrow>Cum funcționează</Eyebrow>
-            <h2 className="mt-6 text-headline text-gradient">Trei pași, fără bătăi de cap.</h2>
+            <h2 className="mt-6 text-headline text-gradient">
+              <WordsUp>Trei pași, fără bătăi de cap.</WordsUp>
+            </h2>
           </Reveal>
 
           <RevealGroup className="mt-14 grid gap-10 md:grid-cols-3">
@@ -141,11 +160,15 @@ export default function ExperiencesPage() {
         <div className="container-page grid gap-14 py-28 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
           <Reveal>
             <Eyebrow>Ofertă</Eyebrow>
-            <h2 className="mt-6 text-headline text-gradient">Spune-ne planul.</h2>
-            <p className="mt-5 max-w-md text-body-lg text-ink-muted">
-              Nu trebuie să ai totul stabilit. Scrie-ne ce știi până acum și
-              construim programul împreună.
-            </p>
+            <h2 className="mt-6 text-headline text-gradient">
+              <WordsUp>Spune-ne planul.</WordsUp>
+            </h2>
+            <ClipReveal className="mt-5">
+              <p className="max-w-md text-body-lg text-ink-muted">
+                Nu trebuie să ai totul stabilit. Scrie-ne ce știi până acum și
+                construim programul împreună.
+              </p>
+            </ClipReveal>
 
             <p className="mt-10 text-sm text-ink-muted">
               Preferi să vorbim direct?{" "}

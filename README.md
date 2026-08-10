@@ -102,11 +102,14 @@ panels inside a locally-rendered `<Environment>` — no HDR file is fetched, so
 there's no external request and no CSP exception. Swap in `useGLTF` later
 without touching the scene rig.
 
-**The second 3D scene is gated hardest.** `FleetStage` puts the coach behind the
-fleet section, but a second WebGL context carries its own GL state and memory —
-so it mounts only on the `high` tier and only while on screen, and it *unmounts*
-when scrolled away rather than idling. Below that tier the section shows the
-photography, which is the more informative content anyway.
+**Secondary 3D is gated hardest.** `AmbientCoach` puts the coach behind the
+fleet section and behind the masthead of every vehicle-related page, but a
+second WebGL context carries its own GL state and memory — so it mounts only on
+the `high` tier and only while on screen, and it *unmounts* when scrolled away
+rather than idling (verified: 1 canvas at the top of `/flota`, 0 after scrolling
+past the header). Below that tier the section shows its photography and its
+glow layer, which is the more informative content anyway. Two presets,
+`ambient` and `feature`, are the only knobs a caller gets.
 
 **The 3D is gated three ways.** `CoachStage` code-splits the Three.js bundle,
 mounts it only when the hero is near the viewport, and skips WebGL entirely on
@@ -130,6 +133,41 @@ that scroll (measured: 748px on the terms page). It also never calls
 `preventDefault`, so the browser jumps natively at the same time. `AnchorLink`
 wraps this while staying a real `<a href="#id">`: modified clicks, middle-click
 and the context menu keep their native behaviour, and the URL still updates.
+
+**Above-the-fold entrances are CSS, never Framer Motion.** `PageHeader` and the
+hero both animate through `anim-rise` / `anim-word` keyframes. A Framer
+`initial={{ opacity: 0 }}` ships literal `opacity:0` in the server HTML, so the
+`<h1>` — the LCP element on every page — would hold the largest paint until
+hydration. `WordReveal` splits the headline into masked words with staggered
+`animation-delay`, with real space text nodes *between* the masks so
+`textContent` stays a readable sentence. Below the fold, where nothing is
+LCP, Framer and GSAP take over.
+
+**Every scroll reveal has to be safe in a stuck state.** A scroll-triggered
+`fromTo` applies its from-state the moment it is created, so if the trigger
+never fires — deep link, restored scroll position, jump-scroll — the content
+stays parked out of frame and reads as missing. `WordsUp`/`ClipReveal`/
+`ReadThrough` therefore call `alreadyInView()` first and simply do not hide
+anything the reader can already see, and scrubbed tweens carry an opacity
+floor. An animation must never be the thing that makes content visible.
+
+### The motion toolkit
+
+| Component | File | Job |
+| --- | --- | --- |
+| `WordReveal` | `motion/word-reveal.tsx` | CSS word-mask headline, LCP-safe |
+| `Reveal` / `RevealGroup` / `RevealItem` | `motion/reveal.tsx` | Discrete entrances (Framer) |
+| `WordsUp` / `ClipReveal` / `ReadThrough` | `motion/text-reveal.tsx` | Scroll-linked text (GSAP) |
+| `Parallax` / `ScaleIn` / `ScrollLines` / `CountUp` | `motion/scroll-effects.tsx` | Scrubbed, scroll-position-linked |
+| `Magnetic` / `TiltCard` / `Spotlight` | `motion/magnetic.tsx` | Pointer reactions, CSS vars only |
+| `AnchorLink` | `motion/anchor-link.tsx` | In-page jumps through Lenis |
+| `CoachStage` / `AmbientCoach` | `three/` | The 3D moments and their gates |
+
+The split is deliberate: Framer for discrete entrances, GSAP for anything that
+must stay *linked* to scroll position, CSS for anything above the fold. Pointer
+effects write CSS custom properties straight to the node and never touch React
+state — a magnetic button re-rendering on every mouse event would be the
+laggiest thing on the page, and the effect exists to feel effortless.
 
 ### Using the scene elsewhere
 

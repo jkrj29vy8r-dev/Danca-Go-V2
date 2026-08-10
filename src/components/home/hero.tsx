@@ -1,10 +1,9 @@
-import { Fragment } from "react";
 import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
+import { WordReveal } from "@/components/motion/word-reveal";
 import { SearchWidget } from "./search-widget";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, site } from "@/lib/site";
-import { cn } from "@/lib/utils";
 
 /**
  * Hero composition, top to bottom: type → 3D coach → search dock.
@@ -117,49 +116,6 @@ function SearchDock() {
         </div>
       </div>
     </div>
-  );
-}
-
-/**
- * Splits a line into words that rise from behind a mask. Each word is a plain
- * span with a staggered CSS animation-delay — no client JS involved, and the
- * full string stays in the accessibility tree.
- */
-function WordReveal({
-  text,
-  delay = 0,
-  className,
-}: {
-  text: string;
-  delay?: number;
-  className?: string;
-}) {
-  const words = text.split(" ");
-
-  return (
-    <span className={cn("inline-block", className)}>
-      {words.map((word, index) => (
-        <Fragment key={`${word}-${index}`}>
-          <span className="inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]">
-            <span
-              className="anim-word"
-              style={{ animationDelay: `${delay + index * 0.055}s` }}
-            >
-              {word}
-            </span>
-          </span>
-          {/*
-            A real space, as a text node *between* the masks — not inside one.
-            Trailing whitespace within an inline-block gets trimmed, which is
-            what silently ran the words together ("Drumultău"). Setting a
-            margin instead fixes the visuals but leaves textContent unspaced,
-            so screen readers and crawlers still read one long word. A sibling
-            text node is the only version that's correct both ways.
-          */}
-          {index < words.length - 1 ? " " : null}
-        </Fragment>
-      ))}
-    </span>
   );
 }
 

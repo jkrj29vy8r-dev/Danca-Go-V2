@@ -4,9 +4,11 @@ import { PageHeader } from "@/components/layout/page-header";
 import { RentalForm } from "@/components/rentals/rental-form";
 import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
 import { Card } from "@/components/ui/card";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { Magnetic, TiltCard } from "@/components/motion/magnetic";
+import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
 import { fleet, fleetNote, phoneDisplay, rentalBenefits, site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -22,16 +24,29 @@ export default function RentalsPage() {
         eyebrow="Închirieri"
         title="Autocarul tău, programul tău."
         lead="Închiriem autocare și microbuze cu șofer, de la 12 locuri în sus. Tu stabilești traseul și orele — noi ducem grupul la destinație."
+        scene="feature"
       >
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <ButtonLink href="#oferta" variant="accent" size="lg" className="group">
-            Solicită ofertă
-            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </ButtonLink>
-          <ButtonLink href={`tel:${site.phones[0]}`} variant="secondary" size="lg">
-            <Phone className="size-4" aria-hidden />
-            <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
-          </ButtonLink>
+          <Magnetic strength={0.22} className="w-full sm:w-auto">
+            <ButtonLink
+              href="#oferta"
+              variant="accent"
+              size="lg"
+              className="group w-full sm:w-auto"
+            >
+              Solicită ofertă
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </ButtonLink>
+          </Magnetic>
+
+          {/* Plain anchor: `tel:` is a protocol handler, not a route for the
+              client router to prefetch. */}
+          <Button asChild variant="secondary" size="lg">
+            <a href={`tel:${site.phones[0]}`}>
+              <Phone className="size-4" aria-hidden />
+              <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
+            </a>
+          </Button>
         </div>
       </PageHeader>
 
@@ -39,7 +54,9 @@ export default function RentalsPage() {
       <section className="container-page pb-28">
         <Reveal className="max-w-2xl">
           <Eyebrow>Vehicule disponibile</Eyebrow>
-          <h2 className="mt-6 text-headline text-gradient">Alege după mărimea grupului.</h2>
+          <h2 className="mt-6 text-headline text-gradient">
+            <WordsUp>Alege după mărimea grupului.</WordsUp>
+          </h2>
           <p className="mt-5 text-body-lg text-ink-muted">
             Dacă nu ești sigur ce ți se potrivește, spune-ne câți sunteți și îți
             recomandăm noi vehiculul.
@@ -49,11 +66,16 @@ export default function RentalsPage() {
         <RevealGroup className="mt-14 grid gap-4 md:grid-cols-3">
           {fleet.map((vehicle) => (
             <RevealItem key={vehicle.slug}>
-              <Card className="flex h-full flex-col" interactive={false}>
-                <VehiclePhoto
-                  vehicle={vehicle}
-                  className="rounded-b-none border-0 border-b border-hairline"
-                />
+              <TiltCard maxTilt={4} className="h-full">
+              <Card className="flex h-full flex-col transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1" interactive={false}>
+                {/* The photo scales inside its own clipped frame on hover —
+                    the vehicle comes toward you, the card stays put. */}
+                <div className="overflow-hidden rounded-t-[inherit]">
+                  <VehiclePhoto
+                    vehicle={vehicle}
+                    className="rounded-b-none border-0 border-b border-hairline transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover/tilt:scale-[1.04]"
+                  />
+                </div>
 
                 <div className="flex flex-1 flex-col p-7">
                   <p className="text-sm text-accent">{vehicle.seats}</p>
@@ -72,6 +94,7 @@ export default function RentalsPage() {
                   </ul>
                 </div>
               </Card>
+              </TiltCard>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -87,7 +110,7 @@ export default function RentalsPage() {
           <Reveal className="max-w-2xl">
             <Eyebrow>De ce noi</Eyebrow>
             <h2 className="mt-6 text-headline text-gradient">
-              Un autocar închiriat se judecă în detalii.
+              <WordsUp>Un autocar închiriat se judecă în detalii.</WordsUp>
             </h2>
           </Reveal>
 
@@ -112,11 +135,15 @@ export default function RentalsPage() {
         <div className="container-page grid gap-14 py-28 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
           <Reveal>
             <Eyebrow>Ofertă</Eyebrow>
-            <h2 className="mt-6 text-headline text-gradient">Spune-ne ce ai nevoie.</h2>
-            <p className="mt-5 max-w-md text-body-lg text-ink-muted">
-              Completezi în două minute, primești un preț ferm în cel mult 24 de
-              ore. Fără costuri care apar la final.
-            </p>
+            <h2 className="mt-6 text-headline text-gradient">
+              <WordsUp>Spune-ne ce ai nevoie.</WordsUp>
+            </h2>
+            <ClipReveal className="mt-5">
+              <p className="max-w-md text-body-lg text-ink-muted">
+                Completezi în două minute, primești un preț ferm în cel mult 24 de
+                ore. Fără costuri care apar la final.
+              </p>
+            </ClipReveal>
 
             <p className="mt-10 text-sm text-ink-muted">
               Preferi să vorbim direct?{" "}

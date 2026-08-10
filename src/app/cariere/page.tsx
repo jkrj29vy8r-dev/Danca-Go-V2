@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { ArrowUpRight, Check, Mail, MapPin, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import { TiltCard } from "@/components/motion/magnetic";
+import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
+import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
+import { ScaleIn } from "@/components/motion/scroll-effects";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { careerBenefits, hiringSteps, openRoles } from "@/lib/careers";
@@ -28,6 +30,7 @@ export default function CareersPage() {
         eyebrow="Cariere"
         title="Căutăm oameni care iau volanul în serios."
         lead="Suntem o echipă mică dintr-un oraș mic, care duce zilnic oameni la aeroport, la muncă și acasă. Dacă îți place drumul și nu faci rabat la siguranță, hai să vorbim."
+        scene="ambient"
       />
 
       <section className="container-page pb-28">
@@ -48,18 +51,22 @@ export default function CareersPage() {
 
       <section className="container-page pb-28">
         <Reveal>
-          <h2 className="text-headline text-gradient">Posturi deschise</h2>
-          <p className="mt-5 max-w-xl text-body-lg text-ink-muted">
-            Angajăm constant pe rolurile de mai jos. Chiar dacă nu vezi exact poziția
-            ta, trimite-ne CV-ul — flota crește.
-          </p>
+          <h2 className="text-headline text-gradient">
+            <WordsUp>Posturi deschise</WordsUp>
+          </h2>
+          <ClipReveal className="mt-5">
+            <p className="max-w-xl text-body-lg text-ink-muted">
+              Angajăm constant pe rolurile de mai jos. Chiar dacă nu vezi exact poziția
+              ta, trimite-ne CV-ul — flota crește.
+            </p>
+          </ClipReveal>
         </Reveal>
 
         <div className="mt-12 flex flex-col gap-5">
           {openRoles.map((role) => (
             <Reveal key={role.slug}>
               <TiltCard maxTilt={3}>
-                <Card className="p-8 md:p-10">
+                <Card className="p-8 md:p-10 transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-0.5">
                   <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
                     <div>
                       <span className="inline-block rounded-full border border-hairline px-3 py-1 text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
@@ -129,7 +136,9 @@ export default function CareersPage() {
 
       <section className="container-page pb-28">
         <Reveal>
-          <h2 className="text-title text-ink">Cum decurge angajarea</h2>
+          <h2 className="text-title text-ink">
+            <WordsUp>Cum decurge angajarea</WordsUp>
+          </h2>
         </Reveal>
 
         <RevealGroup className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
@@ -150,10 +159,12 @@ export default function CareersPage() {
       </section>
 
       <section className="container-page pb-8">
-        <Reveal>
-          <div className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12">
+        <ScaleIn>
+          <Spotlight className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12" size={560}>
             <div>
-              <h2 className="text-title text-ink">Nu ai găsit rolul potrivit?</h2>
+              <h2 className="text-title text-ink">
+                <WordsUp>Nu ai găsit rolul potrivit?</WordsUp>
+              </h2>
               <p className="mt-3 max-w-md leading-relaxed text-ink-muted">
                 Trimite-ne oricum CV-ul. Păstrăm candidaturile și revenim când
                 deschidem o poziție care ți se potrivește.
@@ -161,12 +172,14 @@ export default function CareersPage() {
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Button asChild variant="primary" size="lg">
-                <a href={applyHref()}>
-                  <Mail className="size-4" aria-hidden />
-                  Trimite CV-ul
-                </a>
-              </Button>
+              <Magnetic strength={0.2}>
+                <Button asChild variant="primary" size="lg">
+                  <a href={applyHref()}>
+                    <Mail className="size-4" aria-hidden />
+                    Trimite CV-ul
+                  </a>
+                </Button>
+              </Magnetic>
               <Button asChild variant="secondary" size="lg">
                 <a href={`tel:${site.phones[0]}`}>
                   <Phone className="size-4" aria-hidden />
@@ -174,8 +187,8 @@ export default function CareersPage() {
                 </a>
               </Button>
             </div>
-          </div>
-        </Reveal>
+          </Spotlight>
+        </ScaleIn>
       </section>
     </>
   );

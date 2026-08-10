@@ -495,11 +495,31 @@ export const experienceExamples = [
 /*                             TRUST / PROOF POINTS                            */
 /* -------------------------------------------------------------------------- */
 
-export const stats = [
-  { value: String(new Date().getFullYear() - site.founded), suffix: "ani", label: "de drum neîntrerupt" },
-  { value: "1.800+", suffix: "", label: "pasageri mulțumiți" },
-  { value: "4.6", suffix: "/5", label: "rating de la pasageri" },
-  { value: "10", suffix: "orașe", label: "conectate zilnic" },
+/**
+ * Proof numbers.
+ *
+ * `value` is the number itself and `decimals`/`valueSuffix` say how to render
+ * it, so a component can animate it up from zero without parsing a formatted
+ * string back into a number — "1.800+" is not something `Number()` can read,
+ * and guessing would silently turn it into 1.8.
+ */
+export const stats: {
+  value: number;
+  decimals?: number;
+  /** Glued to the number, e.g. the "+" in "1.800+". */
+  valueSuffix?: string;
+  /** Set apart from the number, in a lighter weight. */
+  suffix?: string;
+  label: string;
+}[] = [
+  {
+    value: new Date().getFullYear() - site.founded,
+    suffix: "ani",
+    label: "de drum neîntrerupt",
+  },
+  { value: 1800, valueSuffix: "+", label: "pasageri mulțumiți" },
+  { value: 4.6, decimals: 1, suffix: "/5", label: "rating de la pasageri" },
+  { value: 10, suffix: "orașe", label: "conectate zilnic" },
 ];
 
 /** Rating distribution behind the 4.6 average. */

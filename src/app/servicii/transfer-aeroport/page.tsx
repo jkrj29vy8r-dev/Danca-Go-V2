@@ -5,8 +5,9 @@ import { ArrowRight, ArrowUpRight, Check, Clock, PlaneTakeoff } from "lucide-rea
 import { PageHeader } from "@/components/layout/page-header";
 import { FaqList } from "@/components/faq/faq-browser";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import { Magnetic, TiltCard } from "@/components/motion/magnetic";
-import { WordsUp } from "@/components/motion/text-reveal";
+import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
+import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
+import { Parallax } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
@@ -87,19 +88,22 @@ export default function AirportTransferPage() {
         eyebrow="Serviciu"
         title="Transfer aeroport Otopeni."
         lead="Din Târgu Neamț, Piatra Neamț, Roman și Bacău până la terminalul de plecări al Aeroportului Henri Coandă. Zilnic, cu loc rezervat sau cu vehicul doar pentru voi."
+        scene="ambient"
       />
 
       <section className="container-page pb-24">
         <Reveal>
           <div className="relative aspect-[16/9] overflow-hidden rounded-3xl border border-hairline bg-surface md:aspect-[21/9]">
-            <Image
-              src="/fleet/sprinter-aeroport.jpg"
-              alt="Microbuz Mercedes-Benz Sprinter din flota Danca Go, oprit la terminalul aeroportului"
-              fill
-              priority
-              sizes="(min-width: 1280px) 1200px, 100vw"
-              className="object-cover"
-            />
+            <Parallax speed={0.12} className="absolute inset-0 scale-110">
+              <Image
+                src="/fleet/sprinter-aeroport.jpg"
+                alt="Microbuz Mercedes-Benz Sprinter din flota Danca Go, oprit la terminalul aeroportului"
+                fill
+                priority
+                sizes="(min-width: 1280px) 1200px, 100vw"
+                className="object-cover"
+              />
+            </Parallax>
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
@@ -121,17 +125,19 @@ export default function AirportTransferPage() {
           <h2 className="text-headline text-gradient">
             <WordsUp>Două feluri de a ajunge la avion.</WordsUp>
           </h2>
-          <p className="mt-5 max-w-xl text-body-lg text-ink-muted">
-            Nu încercăm să îți vindem varianta scumpă. Îți spunem când are sens
-            fiecare dintre ele.
-          </p>
+          <ClipReveal className="mt-5">
+            <p className="max-w-xl text-body-lg text-ink-muted">
+              Nu încercăm să îți vindem varianta scumpă. Îți spunem când are sens
+              fiecare dintre ele.
+            </p>
+          </ClipReveal>
         </Reveal>
 
         <div className="mt-12 grid gap-5 lg:grid-cols-2">
           {options.map((option) => (
             <Reveal key={option.title}>
               <TiltCard maxTilt={4} className="h-full">
-                <Card className="flex h-full flex-col p-8 md:p-10">
+                <Spotlight className="surface-card flex h-full flex-col overflow-hidden p-8 md:p-10" size={520}>
                   <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-accent">
                     {option.tagline}
                   </span>
@@ -160,7 +166,7 @@ export default function AirportTransferPage() {
                       </ButtonLink>
                     </Magnetic>
                   </div>
-                </Card>
+                </Spotlight>
               </TiltCard>
             </Reveal>
           ))}
@@ -169,7 +175,9 @@ export default function AirportTransferPage() {
 
       <section className="container-page pb-28">
         <Reveal>
-          <h2 className="text-title text-ink">Curse regulate spre Otopeni</h2>
+          <h2 className="text-title text-ink">
+            <WordsUp>Curse regulate spre Otopeni</WordsUp>
+          </h2>
           <p className="mt-3 max-w-xl text-ink-muted">
             Plecări zilnice. Prețurile sunt de persoană și includ TVA.
           </p>
@@ -178,45 +186,50 @@ export default function AirportTransferPage() {
         <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {airportRoutes.map((route) => (
             <RevealItem key={route.slug}>
-              <Card className="h-full">
-                <Link href={`/rute/${route.slug}`} className="flex h-full flex-col justify-between gap-10 p-7">
-                  <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
-                        {route.frequency}
-                      </span>
-                      <ArrowUpRight
-                        aria-hidden
-                        className="size-4 shrink-0 text-ink-faint transition-all duration-500 ease-[var(--ease-out-expo)] group-hover/card:-translate-y-0.5 group-hover/card:translate-x-0.5 group-hover/card:text-accent"
-                      />
+              <TiltCard maxTilt={4} className="h-full">
+                <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
+                  <Link
+                    href={`/rute/${route.slug}`}
+                    className="flex h-full flex-col justify-between gap-10 p-7"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-4">
+                        <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                          {route.frequency}
+                        </span>
+                        <ArrowUpRight
+                          aria-hidden
+                          className="size-4 shrink-0 text-ink-faint transition-all duration-500 ease-[var(--ease-out-expo)] group-hover/card:-translate-y-0.5 group-hover/card:translate-x-0.5 group-hover/card:text-accent"
+                        />
+                      </div>
+                      <p className="mt-6 text-[1.375rem] font-medium leading-tight tracking-[-0.02em] text-ink">
+                        {route.from}
+                      </p>
+                      <p className="mt-1 flex items-center gap-2 text-[1.375rem] font-medium leading-tight tracking-[-0.02em] text-ink-muted">
+                        <span aria-hidden className="text-accent">
+                          ↓
+                        </span>
+                        Otopeni
+                      </p>
                     </div>
-                    <p className="mt-6 text-[1.375rem] font-medium leading-tight tracking-[-0.02em] text-ink">
-                      {route.from}
-                    </p>
-                    <p className="mt-1 flex items-center gap-2 text-[1.375rem] font-medium leading-tight tracking-[-0.02em] text-ink-muted">
-                      <span aria-hidden className="text-accent">
-                        ↓
-                      </span>
-                      Otopeni
-                    </p>
-                  </div>
 
-                  <div className="flex items-end justify-between gap-4 border-t border-hairline pt-5">
-                    <span className="flex items-center gap-1.5 text-sm text-ink-dim">
-                      <Clock className="size-3.5" aria-hidden />
-                      {formatDuration(route.durationMinutes)}
-                    </span>
-                    <span className="text-right">
-                      <span className="block text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
-                        de la
+                    <div className="flex items-end justify-between gap-4 border-t border-hairline pt-5">
+                      <span className="flex items-center gap-1.5 text-sm text-ink-dim">
+                        <Clock className="size-3.5" aria-hidden />
+                        {formatDuration(route.durationMinutes)}
                       </span>
-                      <span className="text-lg font-medium tabular-nums text-ink">
-                        {formatPrice(route.fromPrice)}
+                      <span className="text-right">
+                        <span className="block text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
+                          de la
+                        </span>
+                        <span className="text-lg font-medium tabular-nums text-ink">
+                          {formatPrice(route.fromPrice)}
+                        </span>
                       </span>
-                    </span>
-                  </div>
-                </Link>
-              </Card>
+                    </div>
+                  </Link>
+                </Card>
+              </TiltCard>
             </RevealItem>
           ))}
         </RevealGroup>
@@ -224,7 +237,9 @@ export default function AirportTransferPage() {
 
       <section className="container-page pb-28">
         <Reveal>
-          <h2 className="text-title text-ink">Cum funcționează</h2>
+          <h2 className="text-title text-ink">
+            <WordsUp>Cum funcționează</WordsUp>
+          </h2>
         </Reveal>
 
         <RevealGroup className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
@@ -247,7 +262,9 @@ export default function AirportTransferPage() {
       {airportFaq && (
         <section className="container-page pb-8">
           <Reveal>
-            <h2 className="text-title text-ink">Ce ne întreabă pasagerii</h2>
+            <h2 className="text-title text-ink">
+              <WordsUp>Ce ne întreabă pasagerii</WordsUp>
+            </h2>
           </Reveal>
           <FaqList items={airportFaq.items} className="mt-8 max-w-3xl" />
           <Reveal className="mt-10">

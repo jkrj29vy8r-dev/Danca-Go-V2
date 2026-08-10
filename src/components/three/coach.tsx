@@ -117,9 +117,12 @@ export function Coach({ hovered = false }: { hovered?: boolean }) {
     }
 
     // Barely-there float so the coach never feels like a static screenshot.
+    // Biased upward for the same reason as the scene's float: the tyres sit on
+    // y=0, and anything that dips below it gets sliced by the contact-shadow
+    // plane.
     if (group.current) {
       const t = state.clock.elapsedTime;
-      group.current.position.y = Math.sin(t * 0.55) * 0.04;
+      group.current.position.y = (0.5 + 0.5 * Math.sin(t * 0.55)) * 0.04;
     }
   });
 

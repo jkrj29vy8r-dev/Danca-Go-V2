@@ -14,7 +14,9 @@ import {
 import { PageHeader } from "@/components/layout/page-header";
 import { FaqList } from "@/components/faq/faq-browser";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import { Magnetic } from "@/components/motion/magnetic";
+import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
+import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
+import { ScaleIn } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqJsonLd, type FaqItem } from "@/lib/faq";
@@ -168,24 +170,20 @@ export default async function RoutePage({
 
       <PageHeader
         eyebrow="Rută"
-        title={
-          <>
-            {route.from}{" "}
-            {/* role="img" + aria-label swaps the glyph for a word in the
-                accessibility tree — a screen reader says "Roman spre
-                Constanța" instead of "right arrow" — while textContent stays a
-                clean "Roman → Constanța" for anything that reads the DOM. */}
-            <span role="img" aria-label="spre" className="text-accent">
-              →
-            </span>{" "}
-            {route.to}
-          </>
-        }
+        title={`${route.from} → ${route.to}`}
+        // The glyph is its own token after the word split, so it picks up the
+        // accent colour and swaps to the word "spre" in the accessibility tree
+        // — while textContent stays a clean "Roman → Constanța".
+        titleHighlight="→"
+        titleHighlightLabel="spre"
+        scene="ambient"
         lead={`Plecări ${route.frequency.toLowerCase()}, aproximativ ${formatDuration(
           route.durationMinutes,
         )} de drum, cu opriri anunțate din timp. Rezervi online și primești codul pe loc.`}
       >
-        <Reveal className="mt-10 flex flex-col gap-3 sm:flex-row" delay={0.1}>
+        {/* PageHeader already staggers its children in — no Reveal here, or
+            the block would animate twice. */}
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Magnetic strength={0.2} className="w-full sm:w-auto">
             <ButtonLink
               href={bookingHref(route)}
@@ -208,7 +206,7 @@ export default async function RoutePage({
             <ArrowLeftRight className="size-4" aria-hidden />
             Sensul invers
           </ButtonLink>
-        </Reveal>
+        </div>
       </PageHeader>
 
       <section className="container-page pb-24">
@@ -248,7 +246,9 @@ export default async function RoutePage({
         <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
           <div>
             <Reveal>
-              <h2 className="text-headline text-gradient">Traseul, pas cu pas.</h2>
+              <h2 className="text-headline text-gradient">
+                <WordsUp>Traseul, pas cu pas.</WordsUp>
+              </h2>
               <p className="mt-5 max-w-md leading-relaxed text-ink-muted">
                 {stops.length > 0
                   ? "Oprim în fiecare dintre localitățile de mai jos. Dacă urci dintr-una dintre ele, spune-ne la rezervare și îți confirmăm punctul exact."
@@ -269,10 +269,12 @@ export default async function RoutePage({
 
           <div>
             <Reveal>
-              <h2 className="text-title text-ink">Ce include biletul</h2>
+              <h2 className="text-title text-ink">
+                <WordsUp>Ce include biletul</WordsUp>
+              </h2>
             </Reveal>
 
-            <Reveal className="mt-8" delay={0.05}>
+            <ClipReveal className="mt-8">
               <ul className="flex flex-col gap-4">
                 {inclusions.map((item) => (
                   <li
@@ -284,10 +286,10 @@ export default async function RoutePage({
                   </li>
                 ))}
               </ul>
-            </Reveal>
+            </ClipReveal>
 
-            <Reveal className="mt-10" delay={0.1}>
-              <div className="surface-card p-8">
+            <ScaleIn className="mt-10">
+              <Spotlight className="surface-card overflow-hidden p-8" size={480}>
                 <h3 className="text-[1.0625rem] font-medium tracking-[-0.015em] text-ink">
                   Călătoriți în grup?
                 </h3>
@@ -300,8 +302,8 @@ export default async function RoutePage({
                   Cere o ofertă
                   <ArrowUpRight className="size-4 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </ButtonLink>
-              </div>
-            </Reveal>
+              </Spotlight>
+            </ScaleIn>
           </div>
         </div>
       </section>
@@ -309,13 +311,16 @@ export default async function RoutePage({
       {related.length > 0 && (
         <section className="container-page pb-28">
           <Reveal>
-            <h2 className="text-title text-ink">Alte plecări spre {route.to}</h2>
+            <h2 className="text-title text-ink">
+              <WordsUp>{`Alte plecări spre ${route.to}`}</WordsUp>
+            </h2>
           </Reveal>
 
           <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
               <RevealItem key={item.slug}>
-                <Card className="h-full">
+                <TiltCard maxTilt={4} className="h-full">
+                <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
                   <Link href={`/rute/${item.slug}`} className="flex h-full flex-col justify-between gap-8 p-7">
                     <div>
                       <span className="text-[0.6875rem] uppercase tracking-[0.14em] text-ink-dim">
@@ -336,6 +341,7 @@ export default async function RoutePage({
                     </div>
                   </Link>
                 </Card>
+                </TiltCard>
               </RevealItem>
             ))}
           </RevealGroup>

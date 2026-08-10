@@ -6,7 +6,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
 import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
-import { FleetStage } from "@/components/three/fleet-stage";
+import { AmbientCoach } from "@/components/three/ambient-coach";
 import { Magnetic } from "@/components/motion/magnetic";
 import { fleet, fleetNote } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -63,7 +63,7 @@ export function FleetSection() {
 
         {/* Second 3D moment. Sits behind the panel as atmosphere, gated to the
             high tier only — a second WebGL context is not free. */}
-        <FleetStage className="pointer-events-none absolute inset-x-0 top-1/2 h-[60%] -translate-y-1/2" />
+        <AmbientCoach className="pointer-events-none absolute inset-x-0 top-1/2 h-[60%] -translate-y-1/2" />
 
         <div className="container-page relative grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:items-center">
           {/* --- Copy column --- */}

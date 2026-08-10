@@ -4,6 +4,8 @@ import { ArrowUpRight, Clock } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { WordsUp } from "@/components/motion/text-reveal";
+import { TiltCard } from "@/components/motion/magnetic";
 import { featuredRoutes } from "@/lib/site";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
@@ -26,6 +28,7 @@ export default function RoutesPage() {
         eyebrow="Rețeaua"
         title="Toate rutele noastre."
         lead="Legături directe între orașele din Moldova, capitală, aeroportul Otopeni și litoral — operate cu aceleași standarde pe fiecare kilometru."
+        scene="ambient"
       />
 
       <div className="container-page flex flex-col gap-24 pb-24">
@@ -36,13 +39,16 @@ export default function RoutesPage() {
           return (
             <section key={hub.key}>
               <Reveal>
-                <h2 className="text-title text-ink">{hub.label}</h2>
+                <h2 className="text-title text-ink">
+                  <WordsUp>{hub.label}</WordsUp>
+                </h2>
               </Reveal>
 
               <RevealGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {routes.map((route) => (
                   <RevealItem key={route.slug}>
-                    <Card className="h-full">
+                    <TiltCard maxTilt={4} className="h-full">
+                    <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
                       <Link
                         href={`/rute/${route.slug}`}
                         className="flex h-full flex-col justify-between gap-10 p-7"
@@ -83,6 +89,7 @@ export default function RoutesPage() {
                         </div>
                       </Link>
                     </Card>
+                    </TiltCard>
                   </RevealItem>
                 ))}
               </RevealGroup>

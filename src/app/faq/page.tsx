@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Mail, Phone } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { FaqBrowser } from "@/components/faq/faq-browser";
-import { Reveal } from "@/components/motion/reveal";
+import { Magnetic, Spotlight } from "@/components/motion/magnetic";
+import { WordsUp } from "@/components/motion/text-reveal";
+import { ScaleIn } from "@/components/motion/scroll-effects";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
 import { phoneDisplay, site } from "@/lib/site";
@@ -33,10 +35,12 @@ export default function FaqPage() {
       </section>
 
       <section className="container-page pb-8">
-        <Reveal>
-          <div className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12">
+        <ScaleIn>
+          <Spotlight className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12" size={560}>
             <div>
-              <h2 className="text-title text-ink">A rămas o întrebare fără răspuns?</h2>
+              <h2 className="text-title text-ink">
+                <WordsUp>A rămas o întrebare fără răspuns?</WordsUp>
+              </h2>
               <p className="mt-3 max-w-md leading-relaxed text-ink-muted">
                 Scrie-ne sau sună-ne. Răspunde un om care știe exact ce vehicul pleacă
                 mâine dimineață și de unde.
@@ -44,10 +48,12 @@ export default function FaqPage() {
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <ButtonLink href="/contact" variant="primary" size="lg">
-                <Mail className="size-4" aria-hidden />
-                Scrie-ne
-              </ButtonLink>
+              <Magnetic strength={0.2}>
+                <ButtonLink href="/contact" variant="primary" size="lg">
+                  <Mail className="size-4" aria-hidden />
+                  Scrie-ne
+                </ButtonLink>
+              </Magnetic>
               {/* Plain anchor, not ButtonLink: `tel:` is a protocol handler,
                   not a route for the client router to prefetch. */}
               <Button asChild variant="secondary" size="lg">
@@ -57,8 +63,8 @@ export default function FaqPage() {
                 </a>
               </Button>
             </div>
-          </div>
-        </Reveal>
+          </Spotlight>
+        </ScaleIn>
       </section>
     </>
   );

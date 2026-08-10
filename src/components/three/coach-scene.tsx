@@ -152,7 +152,13 @@ function CoachRig({
     outerNode.position.z = THREE.MathUtils.lerp(outerNode.position.z, progress * -2.2, soft);
 
     // Float lives on the inner group so it composes with rotation cleanly.
-    innerNode.position.y = Math.sin(state.clock.elapsedTime * 0.55) * floatAmplitude;
+    //
+    // Biased to [0, amplitude] rather than centred on zero: the wheels rest at
+    // y=0 and the contact-shadow plane sits just above it, so a float that
+    // swings negative pushes the tyres *through* the shadow and clips their
+    // lower half into crescents. A vehicle may hover; it may not sink.
+    innerNode.position.y =
+      (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 0.55)) * floatAmplitude;
   });
 
   return (
