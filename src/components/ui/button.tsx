@@ -20,6 +20,13 @@ const buttonVariants = cva(
     "duration-300 ease-[var(--ease-out-expo)]",
     "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40",
     "[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:pointer-events-none",
+    // Specular sweep on hover. Clipped to the pill, travels once, and is
+    // purely decorative — pointer-events-none so it never eats a click.
+    "overflow-hidden isolate",
+    "after:pointer-events-none after:absolute after:inset-0 after:-z-10",
+    "after:translate-x-[-120%] after:transition-transform after:duration-700",
+    "after:ease-[var(--ease-out-expo)] hover:after:translate-x-[120%]",
+    "after:bg-[linear-gradient(100deg,transparent,rgb(255_255_255/0.22),transparent)]",
   ],
   {
     variants: {

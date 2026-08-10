@@ -6,6 +6,8 @@ import { ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal } from "@/components/motion/reveal";
+import { TiltCard } from "@/components/motion/magnetic";
+import { WordsUp } from "@/components/motion/text-reveal";
 import { services } from "@/lib/site";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -24,7 +26,7 @@ export function ServicesSection() {
       <Reveal className="max-w-2xl">
         <Eyebrow>Ce facem</Eyebrow>
         <h2 className="mt-6 text-headline text-gradient">
-          Transport. Atât, dar făcut impecabil.
+          <WordsUp>Transport. Atât, dar făcut impecabil.</WordsUp>
         </h2>
         <p className="mt-5 max-w-lg text-body-lg text-ink-muted">
           Nu vindem pachete turistice. Vindem drumuri făcute bine — cu orar
@@ -52,6 +54,7 @@ export function ServicesSection() {
               },
             }}
           >
+            <TiltCard className="h-full" maxTilt={5}>
             <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
               <Link
                 href={service.href}
@@ -77,6 +80,7 @@ export function ServicesSection() {
                 </span>
               </Link>
             </Card>
+            </TiltCard>
           </motion.li>
         ))}
       </motion.ul>

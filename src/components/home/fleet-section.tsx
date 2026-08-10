@@ -6,6 +6,8 @@ import { ArrowRight, Check } from "lucide-react";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
 import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
+import { FleetStage } from "@/components/three/fleet-stage";
+import { Magnetic } from "@/components/motion/magnetic";
 import { fleet, fleetNote } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +60,10 @@ export function FleetSection() {
             "--gx": glowX,
           }}
         />
+
+        {/* Second 3D moment. Sits behind the panel as atmosphere, gated to the
+            high tier only — a second WebGL context is not free. */}
+        <FleetStage className="pointer-events-none absolute inset-x-0 top-1/2 h-[60%] -translate-y-1/2" />
 
         <div className="container-page relative grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:items-center">
           {/* --- Copy column --- */}
@@ -112,10 +118,12 @@ export function FleetSection() {
               <span className="text-sm text-ink-dim">{fleetNote.title}</span>
             </div>
 
-            <ButtonLink href="/flota" variant="secondary" size="md" className="group mt-10">
-              Vezi toată flota
-              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-            </ButtonLink>
+            <Magnetic strength={0.18} className="mt-10">
+              <ButtonLink href="/flota" variant="secondary" size="md" className="group">
+                Vezi toată flota
+                <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+              </ButtonLink>
+            </Magnetic>
           </div>
 
           {/* --- Visual column: photo, then specs ---

@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/reveal";
+import { Magnetic, TiltCard } from "@/components/motion/magnetic";
+import { WordsUp } from "@/components/motion/text-reveal";
 import { featuredRoutes } from "@/lib/site";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
@@ -19,7 +21,7 @@ export function RoutesSection() {
         <Reveal className="max-w-2xl">
           <Eyebrow>Rețeaua</Eyebrow>
           <h2 className="mt-6 text-headline text-gradient">
-            Zece orașe. O singură companie.
+            <WordsUp>Zece orașe. O singură companie.</WordsUp>
           </h2>
           <p className="mt-5 max-w-lg text-body-lg text-ink-muted">
             Din Târgu Neamț, Piatra Neamț, Roman și Bacău spre București,
@@ -28,10 +30,12 @@ export function RoutesSection() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <ButtonLink href="/rute" variant="secondary" size="md" className="group">
-            Toate rutele
-            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </ButtonLink>
+          <Magnetic strength={0.18}>
+            <ButtonLink href="/rute" variant="secondary" size="md" className="group">
+              Toate rutele
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </ButtonLink>
+          </Magnetic>
         </Reveal>
       </div>
 
@@ -64,6 +68,7 @@ export function RoutesSection() {
               },
             }}
           >
+            <TiltCard className="h-full" maxTilt={4}>
             <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
               <Link
                 href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
@@ -103,6 +108,7 @@ export function RoutesSection() {
                 </div>
               </Link>
             </Card>
+            </TiltCard>
           </motion.li>
         ))}
       </motion.ul>

@@ -92,6 +92,12 @@ panels inside a locally-rendered `<Environment>` — no HDR file is fetched, so
 there's no external request and no CSP exception. Swap in `useGLTF` later
 without touching the scene rig.
 
+**The second 3D scene is gated hardest.** `FleetStage` puts the coach behind the
+fleet section, but a second WebGL context carries its own GL state and memory —
+so it mounts only on the `high` tier and only while on screen, and it *unmounts*
+when scrolled away rather than idling. Below that tier the section shows the
+photography, which is the more informative content anyway.
+
 **The 3D is gated three ways.** `CoachStage` code-splits the Three.js bundle,
 mounts it only when the hero is near the viewport, and skips WebGL entirely on
 `prefers-reduced-motion` or low-core/low-memory devices — falling back to a
@@ -160,6 +166,25 @@ line-by-line reveals. ScrollTrigger reads from Lenis via the shared ticker, so
 the two never fight over scroll position. Scrubbed tweens keep a high opacity
 floor: a jump-scroll can leave a scrub mid-state, and no conversion CTA should
 ever be sitting at 15% opacity when the user lands on it.
+
+**Pointer effects never touch React state.** `Magnetic`, `TiltCard` and
+`Spotlight` write CSS custom properties straight to the node in a pointermove
+handler. A magnetic button that re-rendered on every mouse event would be the
+laggiest thing on the page, and the effect exists purely to feel effortless.
+All three degrade to plain elements on touch or reduced-motion.
+
+**Scroll reveals refuse to hide anything already on screen.** A scroll-linked
+`fromTo` applies its from-state the moment it is created, so if the trigger then
+never fires — deep link, restored scroll position, jump-scroll — the content
+stays parked out of frame and reads as *missing*. `alreadyInView()` checks the
+element's position at setup and skips the animation entirely when the reader can
+already see it. This bug shipped once (the routes headline rendered blank after a
+jump-scroll) and the guard is the fix.
+
+**Text reveals wrap after mount, never in the server render.** The headline ships
+as plain text and GSAP splits it on the client. Per-word spans in the SSR HTML
+would be invisible until hydration and would flatten `textContent` into one
+run-on word for crawlers and screen readers.
 
 **Timing is the brand.** Entrances run on a single `cubic-bezier(0.16, 1, 0.3,
 1)` at ~1.1s with 0.055s stagger. The slowness is deliberate — the 0.3s/0.02s

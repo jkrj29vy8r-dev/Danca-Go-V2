@@ -68,11 +68,19 @@ export function Navbar() {
                     <Link
                       href={item.href}
                       className={cn(
-                        "relative rounded-full px-3.5 py-2 text-sm transition-colors duration-300",
+                        "group/nav relative rounded-full px-3.5 py-2 text-sm transition-colors duration-300",
                         active ? "text-ink" : "text-ink-muted hover:text-ink",
                       )}
                     >
                       {item.label}
+                      {/* Sweeps out from the centre on hover; skipped on the
+                          active item, which already has its own pill. */}
+                      {!active && (
+                        <span
+                          aria-hidden
+                          className="absolute inset-x-3.5 bottom-1 h-px origin-center scale-x-0 bg-accent/70 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/nav:scale-x-100"
+                        />
+                      )}
                       {active && (
                         <motion.span
                           layoutId="nav-active"

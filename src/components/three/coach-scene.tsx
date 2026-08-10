@@ -13,6 +13,7 @@ import {
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { Coach } from "./coach";
+import { DepthField } from "./depth-field";
 import { detectQuality, type QualitySettings } from "./quality";
 import { clamp } from "@/lib/utils";
 
@@ -33,6 +34,8 @@ import { clamp } from "@/lib/utils";
 export type CoachSceneProps = {
   /** Continuous turntable speed, radians per second. 0 disables it. */
   autoRotate?: number;
+  /** Drifting motes around the subject; adds depth for one draw call. */
+  depthField?: boolean;
   /** How far scroll swings the coach toward a side profile, in radians. */
   scrollInfluence?: number;
   /** Pointer parallax strength, in radians. */
@@ -301,6 +304,7 @@ function GradientDome() {
 
 export default function CoachScene({
   autoRotate = 0.055,
+  depthField = true,
   scrollInfluence = 0.8,
   pointerInfluence = 0.1,
   floatAmplitude = 0.04,
@@ -339,6 +343,8 @@ export default function CoachScene({
 
       <Suspense fallback={null}>
         <StudioLighting quality={quality} />
+
+        {depthField && quality.tier === "high" && <DepthField />}
 
         <group>
           <CoachRig

@@ -1,5 +1,7 @@
 import { ArrowRight, Bus, Phone } from "lucide-react";
 import { ScaleIn } from "@/components/motion/scroll-effects";
+import { Magnetic, Spotlight } from "@/components/motion/magnetic";
+import { WordsUp } from "@/components/motion/text-reveal";
 import { ButtonLink } from "@/components/ui/button";
 import { phoneDisplay, site } from "@/lib/site";
 
@@ -12,7 +14,7 @@ export function CtaSection() {
   return (
     <section className="container-page pb-8">
       <ScaleIn>
-        <div className="surface-card relative overflow-hidden px-8 py-24 text-center md:px-16 md:py-32">
+        <Spotlight className="surface-card overflow-hidden px-8 py-24 text-center md:px-16 md:py-32" size={620}>
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
@@ -34,7 +36,7 @@ export function CtaSection() {
 
           <div className="relative mx-auto max-w-2xl">
             <h2 className="text-headline text-gradient">
-              Următoarea cursă pleacă în curând.
+              <WordsUp>Următoarea cursă pleacă în curând.</WordsUp>
             </h2>
             <p className="mx-auto mt-5 max-w-lg text-body-lg text-ink-muted">
               Rezervă online în mai puțin de un minut sau sună-ne — răspundem
@@ -42,25 +44,29 @@ export function CtaSection() {
             </p>
 
             <div className="mt-11 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <ButtonLink
-                href="/rezervare"
-                variant="accent"
-                size="lg"
-                className="group w-full sm:w-auto"
-              >
-                Rezervă bilet
-                <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-              </ButtonLink>
+              <Magnetic strength={0.22} className="w-full sm:w-auto">
+                <ButtonLink
+                  href="/rezervare"
+                  variant="accent"
+                  size="lg"
+                  className="group w-full sm:w-auto"
+                >
+                  Rezervă bilet
+                  <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+                </ButtonLink>
+              </Magnetic>
 
-              <ButtonLink
-                href="/inchirieri"
-                variant="secondary"
-                size="lg"
-                className="w-full sm:w-auto"
-              >
-                <Bus className="size-4" aria-hidden />
-                Închiriază autocar
-              </ButtonLink>
+              <Magnetic strength={0.22} className="w-full sm:w-auto">
+                <ButtonLink
+                  href="/inchirieri"
+                  variant="secondary"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
+                  <Bus className="size-4" aria-hidden />
+                  Închiriază autocar
+                </ButtonLink>
+              </Magnetic>
             </div>
 
             <a
@@ -71,7 +77,7 @@ export function CtaSection() {
               <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
             </a>
           </div>
-        </div>
+        </Spotlight>
       </ScaleIn>
     </section>
   );
