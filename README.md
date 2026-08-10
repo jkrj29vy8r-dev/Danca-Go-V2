@@ -49,6 +49,35 @@ npx supabase gen types typescript --project-id <id> > src/lib/types/database.ts
 
 ---
 
+## Deploying
+
+The repo builds and deploys as a stock Next.js project — no `vercel.json`, no
+custom build command, framework auto-detection is correct.
+
+**Connect the Git repository** rather than uploading files: every push to the
+branch then redeploys itself, and the fleet photography (2.5 MB) never has to
+be re-uploaded by hand.
+
+1. Vercel → **Add New… → Project** → import `jkrj29vy8r-dev/Danca-Go-V2`
+2. Framework preset: **Next.js** (detected). Leave build and output settings alone.
+3. Add the environment variables below, then **Deploy**.
+
+| Variable | Needed for | If missing |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Search, booking, quote forms | Marketing pages render normally; data surfaces show their designed fallback |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same | Same |
+| `NEXT_PUBLIC_SITE_URL` | Canonical links, sitemap, JSON-LD | Falls back to the Vercel deployment URL, then to `https://dancago.ro` |
+
+The build succeeds with none of them set — that is verified, not assumed, and
+it is why the site can go up before the database does.
+
+`NEXT_PUBLIC_SITE_URL` only needs setting once a custom domain is attached.
+Until then `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL` and
+`NEXT_PUBLIC_VERCEL_URL` — both injected automatically — keep previews from
+publishing canonicals that point at a domain which isn't live yet.
+
+---
+
 ## Architecture
 
 ```

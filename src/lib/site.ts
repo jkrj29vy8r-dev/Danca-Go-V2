@@ -10,13 +10,37 @@
  * stay on transport, vehicles and the people driving them.
  */
 
+/**
+ * The origin this deployment is actually served from.
+ *
+ * It feeds `metadataBase`, every canonical link, the JSON-LD and the sitemap,
+ * so hardcoding the production domain would make a preview deployment publish
+ * canonicals pointing at a site that isn't live yet.
+ *
+ * Order matters: an explicit override wins; then the project's stable
+ * production domain; then this specific deployment's URL, which is what a
+ * preview gets; and finally the domain the site will launch on. The two
+ * `VERCEL_` values are injected automatically — nothing to configure.
+ */
+const resolvedUrl = (() => {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  const host =
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (host) return `https://${host}`;
+
+  return "https://dancago.ro";
+})();
+
 export const site = {
   name: "Danca Go",
   legalName: "Danca Util Ideal S.R.L.",
   tagline: "Transport premium de pasageri.",
   description:
     "Curse regulate între Moldova, București, Otopeni și Constanța. Închirieri de autocare și microbuze de la 12 locuri și experiențe personalizate, la cerere.",
-  url: "https://dancago.ro",
+  url: resolvedUrl,
   locale: "ro-RO",
   rating: { score: 4.6, max: 5, count: 1800 },
   founded: 2019,
