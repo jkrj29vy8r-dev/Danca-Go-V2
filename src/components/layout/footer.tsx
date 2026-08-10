@@ -26,12 +26,12 @@ export function Footer() {
               {site.description}
             </p>
 
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-0.5">
               {site.phones.map((phone) => (
                 <a
                   key={phone}
                   href={`tel:${phone}`}
-                  className="inline-flex w-fit items-center gap-2.5 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
+                  className="inline-flex w-fit items-center gap-2.5 py-1 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
                 >
                   <Phone className="size-3.5 text-accent" aria-hidden />
                   <span className="tabular-nums">{phoneDisplay(phone)}</span>
@@ -39,7 +39,7 @@ export function Footer() {
               ))}
               <a
                 href={`mailto:${site.email}`}
-                className="inline-flex w-fit items-center gap-2.5 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
+                className="inline-flex w-fit items-center gap-2.5 py-1 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
               >
                 <Mail className="size-3.5 text-accent" aria-hidden />
                 {site.email}
@@ -51,7 +51,10 @@ export function Footer() {
             {footerNav.map((group) => (
               <div key={group.title}>
                 <h3 className="text-eyebrow uppercase text-ink-dim">{group.title}</h3>
-                <ul className="mt-5 flex flex-col gap-3">
+                {/* gap-1 + py-1 rather than gap-3 on a bare link: the row keeps
+                    the same rhythm, but the tap target grows from 18px to 26px
+                    and clears the 24px minimum on a phone. */}
+                <ul className="mt-4 flex flex-col gap-1">
                   {/* Keyed by label, not href: two links can legitimately point
                       at the same page ("Închirieri autocare" / "…microbuze"),
                       and href keys would collide. */}
@@ -62,14 +65,14 @@ export function Footer() {
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
+                          className="block py-1 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
                         >
                           {link.label}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
+                          className="block py-1 text-sm text-ink-muted transition-colors duration-300 hover:text-ink"
                         >
                           {link.label}
                         </Link>
