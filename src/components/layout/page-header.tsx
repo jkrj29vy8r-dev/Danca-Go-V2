@@ -11,7 +11,8 @@ export function PageHeader({
   children,
 }: {
   eyebrow: string;
-  title: string;
+  /** ReactNode so a page can accent part of the headline; a string is fine. */
+  title: React.ReactNode;
   lead?: string;
   className?: string;
   children?: React.ReactNode;

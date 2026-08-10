@@ -57,18 +57,28 @@ src/
 │   ├── layout.tsx              Root layout: fonts, metadata, JSON-LD, chrome
 │   ├── page.tsx                Homepage
 │   ├── rezervare/              Search results → [tripId] checkout
-│   ├── rute/ flota/ despre/ contact/
+│   ├── rute/                   Network index + [slug] route landing pages
+│   ├── flota/ despre/ contact/
 │   ├── inchirieri/             Coach hire + quote Server Action
-│   └── experiente/             Custom day trips (shares the quote form)
+│   ├── experiente/             Custom day trips (shares the quote form)
+│   ├── servicii/               Service pages (transfer-aeroport)
+│   ├── faq/ cariere/           Help centre, open roles
+│   ├── legal/[slug]/           Terms, privacy, cookies
+│   ├── sitemap.ts robots.ts    Generated from lib/site + lib/legal
+│   └── icon.svg                Favicon
 ├── components/
-│   ├── ui/                     Design-system primitives (Button, Card, Eyebrow)
+│   ├── ui/                     Design-system primitives (Button, Card, Accordion)
 │   ├── layout/                 Navbar, Footer, PageHeader, Logo
-│   ├── motion/                 Lenis + GSAP provider, reveal + scroll effects
+│   ├── motion/                 Lenis + GSAP provider, reveals, pointer effects
 │   ├── three/                  3D coach, studio rig, performance gate
 │   ├── home/                   Homepage sections
+│   ├── faq/ legal/             Question browser, document shell + ToC
 │   ├── booking/ rentals/       Forms
 ├── lib/
 │   ├── site.ts                 Company facts, navigation, routes, fleet
+│   ├── legal.ts                Terms / privacy / cookies as structured content
+│   ├── faq.ts                  Questions + schema.org FAQPage helper
+│   ├── careers.ts              Open roles, benefits, hiring steps
 │   ├── schemas.ts              Zod schemas shared by client + Server Actions
 │   ├── queries.ts              Server-only data access
 │   ├── supabase/               Browser / server / middleware clients
@@ -110,6 +120,16 @@ then returns a settings object. The `high` tier adds a bloom + vignette pass,
 real shadows and DPR 2; `low` drops the composer and halves the environment
 resolution; `none` renders no canvas at all. Probing errs conservative — being
 wrong costs a plainer render, never a dropped frame budget.
+
+**In-page anchors resolve their own geometry.** `scrollToId` (exported from
+`motion/smooth-scroll.tsx`) computes `rect.top + window.scrollY` and hands Lenis
+a number. Lenis' built-in `anchors` option looks equivalent but derives the
+target from its internal `animatedScroll`, which lags a native scroll by a
+frame — a click landing right after one undershoots by exactly the distance of
+that scroll (measured: 748px on the terms page). It also never calls
+`preventDefault`, so the browser jumps natively at the same time. `AnchorLink`
+wraps this while staying a real `<a href="#id">`: modified clicks, middle-click
+and the context menu keep their native behaviour, and the URL still updates.
 
 ### Using the scene elsewhere
 
@@ -275,11 +295,30 @@ of `lib/site.ts`, which is where all marketing copy originates.
 The company facts in `lib/site.ts` and `supabase/seed.sql` are real; a few
 operational values are reasoned placeholders and should be checked:
 
+- **Registration details** — `legalEntity` in `lib/site.ts` (CUI, trade-register
+  number, registered address, ARR licence) is `null` until someone reads the
+  real values off the company's documents. Until then the legal pages render a
+  visible amber "de completat înainte de lansare" marker instead of a number
+  nobody verified. **These are legally required** on a trader's site in Romania.
 - **Seat counts** per vehicle (the Setra is seeded at 49, Sprinters at 12/16/20)
 - **Fares** and **journey durations** on every route
 - **Departure times** — seeded as 06:30 and 16:30 daily
+- **Boarding points** — the route pages say "confirmăm la rezervare" rather than
+  naming a terminal. Vehicle signage shows *Autogara Obor* and *Autogara Grup*;
+  confirm which route uses which before naming them.
 - **Rating distribution** in `ratingBreakdown` (the 4.6 average is real, the
   per-star split is modelled)
+
+### Keeping the legal text honest
+
+`lib/legal.ts` describes what the site actually does — a 30-minute seat hold,
+cash on boarding, Supabase session cookies and no analytics whatsoever. Those
+claims are load-bearing: the cookie policy is the reason there is no consent
+banner. If payments, analytics or any third-party script are added, the
+documents change in the same commit, and `LEGAL_UPDATED` gets bumped.
+
+`lib/faq.ts` restates several of the same policies in plainer language. The two
+files must agree; a FAQ that contradicts the terms is worse than no FAQ.
 
 ## Fleet photography
 

@@ -44,7 +44,7 @@ export default function RoutesPage() {
                   <RevealItem key={route.slug}>
                     <Card className="h-full">
                       <Link
-                        href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
+                        href={`/rute/${route.slug}`}
                         className="flex h-full flex-col justify-between gap-10 p-7"
                       >
                         <div>

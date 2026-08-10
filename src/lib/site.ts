@@ -29,6 +29,32 @@ export const site = {
   },
 } as const;
 
+/**
+ * Registration details the law requires a trader to publish (OUG 34/2014 and
+ * Legea 365/2002 for distance selling; Regulamentul (UE) 2016/679 for the data
+ * controller identity).
+ *
+ * These are deliberately `null` until someone reads them off the company's own
+ * documents. A plausible-looking invented CUI on a live site is worse than a
+ * visible gap, so the legal pages render an explicit "de completat" marker
+ * instead of a number nobody verified.
+ */
+export const legalEntity: {
+  name: string;
+  cui: string | null;
+  regCom: string | null;
+  /** Full registered address, as it appears on the certificate. */
+  address: string | null;
+  /** ARR transport licence number. */
+  licence: string | null;
+} = {
+  name: site.legalName,
+  cui: null,
+  regCom: null,
+  address: null,
+  licence: null,
+};
+
 export const phoneDisplay = (phone: string) =>
   phone.replace(/^(\+40)(\d{3})(\d{3})(\d{3})$/, "$1 $2 $3 $4");
 
@@ -196,6 +222,35 @@ export const featuredRoutes: FeaturedRoute[] = [
 
 /** Regional pickup points served along the main corridors. */
 export const regionalStops = ["Adjud", "Focșani", "Buzău", "Onești"] as const;
+
+/**
+ * The main north–south corridor, in travel order. Every scheduled route runs
+ * along it before branching to its hub, so a route's intermediate stops are
+ * simply the entries that come after its origin.
+ *
+ * Onești sits on a branch rather than on this line, so it is offered as a
+ * pickup point on request instead of being listed as a stop on every route.
+ */
+export const corridor = [
+  "Târgu Neamț",
+  "Piatra Neamț",
+  "Roman",
+  "Bacău",
+  "Adjud",
+  "Focșani",
+  "Buzău",
+] as const;
+
+export function getRoute(slug: string): FeaturedRoute | undefined {
+  return featuredRoutes.find((route) => route.slug === slug);
+}
+
+/** Corridor towns the vehicle passes through between origin and destination. */
+export function intermediateStops(route: FeaturedRoute): string[] {
+  const start = corridor.indexOf(route.from as (typeof corridor)[number]);
+  if (start === -1) return [];
+  return corridor.slice(start + 1);
+}
 
 /** Cities served, for the marquee and the network list. */
 export const cities = [

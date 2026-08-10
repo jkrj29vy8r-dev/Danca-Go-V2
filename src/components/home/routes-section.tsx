@@ -70,8 +70,11 @@ export function RoutesSection() {
           >
             <TiltCard className="h-full" maxTilt={4}>
             <Card className="h-full transition-transform duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1">
+              {/* The route page, not the search: a visitor arriving from the
+                  homepage still wants to know duration, stops and price before
+                  being dropped into a booking form. */}
               <Link
-                href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
+                href={`/rute/${route.slug}`}
                 className="flex h-full flex-col justify-between gap-10 p-7"
               >
                 <div>

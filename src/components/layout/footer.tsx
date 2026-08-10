@@ -52,8 +52,11 @@ export function Footer() {
               <div key={group.title}>
                 <h3 className="text-eyebrow uppercase text-ink-dim">{group.title}</h3>
                 <ul className="mt-5 flex flex-col gap-3">
+                  {/* Keyed by label, not href: two links can legitimately point
+                      at the same page ("Închirieri autocare" / "…microbuze"),
+                      and href keys would collide. */}
                   {group.links.map((link) => (
-                    <li key={link.href}>
+                    <li key={link.label}>
                       {"external" in link && link.external ? (
                         <a
                           href={link.href}

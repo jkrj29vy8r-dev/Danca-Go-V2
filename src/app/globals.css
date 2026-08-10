@@ -74,6 +74,8 @@
 
   --animate-marquee: marquee 40s linear infinite;
   --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
+  --animate-accordion-down: accordion-down 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-accordion-up: accordion-up 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes marquee {
@@ -98,6 +100,19 @@
 @keyframes glow-pulse {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.6; }
+}
+
+/* Radix measures the panel and exposes its height as a custom property, which
+   is the only way to ease to `auto` without capping long answers at a guessed
+   max-height. */
+@keyframes accordion-down {
+  from { height: 0; opacity: 0; }
+  to   { height: var(--radix-accordion-content-height); opacity: 1; }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); opacity: 1; }
+  to   { height: 0; opacity: 0; }
 }
 
 /* ==========================================================================
