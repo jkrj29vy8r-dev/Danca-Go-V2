@@ -8,6 +8,7 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal } from "@/components/motion/reveal";
 import { TiltCard } from "@/components/motion/magnetic";
 import { WordsUp } from "@/components/motion/text-reveal";
+import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { services } from "@/lib/site";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -22,7 +23,9 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  */
 export function ServicesSection() {
   return (
-    <section className="container-page py-28 md:py-36">
+    <section className="relative overflow-hidden py-28 md:py-36">
+      <SectionAtmosphere align="left" />
+      <div className="container-page">
       <Reveal className="max-w-2xl">
         <Eyebrow>Ce facem</Eyebrow>
         <h2 className="mt-6 text-headline text-gradient">
@@ -84,6 +87,7 @@ export function ServicesSection() {
           </motion.li>
         ))}
       </motion.ul>
+      </div>
     </section>
   );
 }

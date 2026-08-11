@@ -18,7 +18,7 @@ import { formatCount, site } from "@/lib/site";
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-dvh flex-col overflow-hidden pt-28 md:pt-32">
+    <section className="relative flex min-h-dvh flex-col overflow-hidden pt-24 md:pt-28">
       <Backdrop />
 
       <div className="container-page relative z-20">
@@ -38,7 +38,7 @@ export function Hero() {
           </div>
         </div>
 
-        <h1 className="mt-8 text-center text-display-xl text-gradient">
+        <h1 className="mt-6 text-center text-display-xl text-gradient">
           <WordReveal text="Drumul tău," delay={0.2} />
           {/* <br> contributes no whitespace to textContent, so the two lines
               would otherwise concatenate for screen readers and crawlers. */}
@@ -47,7 +47,7 @@ export function Hero() {
         </h1>
 
         <p
-          className="anim-rise mx-auto mt-7 max-w-xl text-center text-body-lg text-ink-muted"
+          className="anim-rise mx-auto mt-6 max-w-xl text-center text-body-lg text-ink-muted"
           style={{ animationDelay: "0.75s" }}
         >
           Curse zilnice din Moldova spre București, Otopeni și Constanța.
@@ -55,7 +55,7 @@ export function Hero() {
         </p>
 
         <div
-          className="anim-rise mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          className="anim-rise mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row"
           style={{ animationDelay: "0.85s" }}
         >
           <ButtonLink
@@ -82,8 +82,11 @@ export function Hero() {
 
       {/* flex-1 with a modest floor: the band absorbs whatever height is left
           after the type and dock, so the dock stays above the fold at 900px
-          and the coach simply gets larger on taller screens. */}
-      <div className="relative z-10 min-h-[170px] flex-1 md:min-h-[210px]">
+          and the coach simply gets larger on taller screens.
+          The camera fit is bound by this band's *height* on every viewport we
+          ship — the coach is a wide, short subject in a wide, short box — so
+          every pixel added here is a directly larger vehicle. */}
+      <div className="relative z-10 min-h-[200px] flex-1 md:min-h-[250px]">
         <CoachStage className="absolute inset-0" />
       </div>
 

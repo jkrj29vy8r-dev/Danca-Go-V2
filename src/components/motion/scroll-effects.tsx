@@ -175,6 +175,105 @@ export function ScrollLines({
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                 ATMOSPHERE                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Where the warm pool sits, so consecutive sections don't stamp out the same
+ * picture. Each entry is `[x%, y%]` for the primary gradient's centre.
+ */
+const ATMOSPHERE_ANCHORS = {
+  left: ["24%", "38%"],
+  right: ["76%", "42%"],
+  centre: ["50%", "34%"],
+} as const;
+
+/**
+ * A drifting backdrop for a content section.
+ *
+ * The site had a real gap here: entrances were everywhere (17 files use
+ * `Reveal`) but continuous, scroll-*linked* motion was almost nowhere — three
+ * of the seven homepage sections were a bare `<section>` with no backdrop at
+ * all. Content faded in once and then sat perfectly still, which is what makes
+ * a page feel static no matter how polished each block is.
+ *
+ * This is the cheap fix: two gradient pools moving at different rates while the
+ * section crosses the viewport. Because they travel at different speeds they
+ * read as separate depths, so scrolling produces parallax rather than a
+ * sliding wash.
+ *
+ * Cost is deliberately near-zero — no images, no extra WebGL context, and only
+ * `transform` is animated, so this stays on the compositor and never triggers
+ * layout or paint. Safe to put in every section on the site.
+ *
+ * The host section must be `relative overflow-hidden`; this layer is
+ * intentionally larger than its box so the pools can travel without their
+ * edges sliding into frame.
+ */
+export function SectionAtmosphere({
+  align = "left",
+  intensity = 1,
+  className,
+}: {
+  align?: keyof typeof ATMOSPHERE_ANCHORS;
+  /** Scales both pools. Below ~0.6 it stops being perceptible. */
+  intensity?: number;
+  className?: string;
+}) {
+  const warm = useRef<HTMLDivElement>(null);
+  const cool = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const warmNode = warm.current;
+    const coolNode = cool.current;
+    if (!warmNode || !coolNode || prefersReducedMotion()) return;
+
+    const context = gsap.context(() => {
+      const common = {
+        ease: "none" as const,
+        scrollTrigger: {
+          trigger: warmNode.parentElement,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      };
+
+      // Opposed directions, unequal magnitudes: same-direction layers at
+      // similar speeds just read as one thing sliding.
+      gsap.fromTo(warmNode, { yPercent: -14, xPercent: -4 }, { yPercent: 12, xPercent: 4, ...common });
+      gsap.fromTo(coolNode, { yPercent: 18 }, { yPercent: -16, ...common });
+    });
+
+    return () => context.revert();
+  }, []);
+
+  const [x, y] = ATMOSPHERE_ANCHORS[align];
+
+  return (
+    <div
+      aria-hidden
+      className={cn("pointer-events-none absolute inset-0 -z-10 overflow-hidden", className)}
+    >
+      <div
+        ref={warm}
+        className="absolute -inset-x-[10%] -inset-y-[25%] will-change-transform"
+        style={{
+          background: `radial-gradient(42% 38% at ${x} ${y}, rgb(200 164 104 / ${0.1 * intensity}), transparent 70%)`,
+        }}
+      />
+      <div
+        ref={cool}
+        className="absolute -inset-x-[10%] -inset-y-[25%] will-change-transform"
+        style={{
+          background: `radial-gradient(38% 34% at ${x === "24%" ? "78%" : "20%"} 68%, rgb(120 150 255 / ${0.06 * intensity}), transparent 70%)`,
+        }}
+      />
+    </div>
+  );
+}
+
 /**
  * Counts a number up when it scrolls into view. Used for the proof stats —
  * a static "4,6" is a fact, an animating one is a claim being made.

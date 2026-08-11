@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -56,20 +56,50 @@ export function DepthField({
     return geo;
   }, [count, radius]);
 
+  /**
+   * A soft round sprite, painted once into a 64px canvas.
+   *
+   * `PointsMaterial` with no map draws each point as a hard-edged **square** —
+   * so "airborne dust" rendered as a field of little grey rectangles floating
+   * around the vehicle. A radial-gradient alpha map is the fix, and generating
+   * it locally keeps the promise the rest of this scene makes: no external
+   * asset requests, nothing to 404, nothing for a CSP to block.
+   */
+  const sprite = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 64;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0, "rgba(255,255,255,1)");
+      gradient.addColorStop(0.4, "rgba(255,255,255,0.5)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 64, 64);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, []);
+
   const material = useMemo(
     () =>
       new THREE.PointsMaterial({
         color: new THREE.Color(color),
         size,
+        map: sprite,
+        alphaMap: sprite,
         sizeAttenuation: true,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.55,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         toneMapped: false,
       }),
-    [color, size],
+    [color, size, sprite],
   );
+
+  useEffect(() => () => sprite.dispose(), [sprite]);
 
   useFrame((_, delta) => {
     const node = group.current;

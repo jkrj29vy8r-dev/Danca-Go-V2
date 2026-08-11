@@ -39,10 +39,43 @@ function alreadyInView(node: HTMLElement, ratio = 0.85) {
  * the wrappers. Under prefers-reduced-motion nothing is wrapped at all.
  */
 
+/**
+ * Finds an ancestor that paints its text through `background-clip: text` —
+ * i.e. anything wearing `.text-gradient` — and returns the gradient it uses.
+ *
+ * This exists because of a paint rule that is very easy to trip over: a
+ * text-clipped background is painted in the *background* phase of its element,
+ * but positioned and transformed descendants paint in a later phase of the
+ * stacking order. A word span that moves — by `transform` or by `position` —
+ * therefore falls outside the ancestor's clip and renders in its own inherited
+ * colour, which for a text-clipped host is `transparent`.
+ *
+ * The effect is silent and complete: 15 headings across the site measured a
+ * peak luminance of 10–34 against a ~8 background, i.e. invisible, and forcing
+ * their word spans back to `position: static` in the browser took that to 255.
+ * Both animation strategies hit it, so the fix cannot be "animate a different
+ * property" — the word has to carry the gradient itself.
+ */
+function textClipGradient(node: HTMLElement): string | null {
+  let host: HTMLElement | null = node;
+
+  while (host && host !== document.body) {
+    const style = getComputedStyle(host);
+    const clip = style.webkitBackgroundClip || style.backgroundClip;
+    if (clip === "text" && style.backgroundImage !== "none") {
+      return style.backgroundImage;
+    }
+    host = host.parentElement;
+  }
+
+  return null;
+}
+
 /** Splits on words, preserving real spaces so textContent stays intact. */
 function wrapWords(node: HTMLElement): HTMLElement[] {
   const text = node.textContent ?? "";
   const words = text.split(/(\s+)/);
+  const gradient = textClipGradient(node);
   node.textContent = "";
 
   const inner: HTMLElement[] = [];
@@ -64,6 +97,18 @@ function wrapWords(node: HTMLElement): HTMLElement[] {
     word.style.display = "inline-block";
     word.textContent = chunk;
 
+    // Re-apply the host's text clip to the word itself, so it keeps painting
+    // the gradient once it is moving and no longer covered by the ancestor's.
+    // The gradient restarts per word rather than running the whole heading —
+    // every word shares a font size and line box, so in practice that reads as
+    // one fade per line, which is what the treatment looks like anyway.
+    if (gradient) {
+      word.style.backgroundImage = gradient;
+      word.style.backgroundClip = "text";
+      word.style.webkitBackgroundClip = "text";
+      word.style.color = "transparent";
+    }
+
     mask.appendChild(word);
     node.appendChild(mask);
     inner.push(word);
@@ -75,6 +120,12 @@ function wrapWords(node: HTMLElement): HTMLElement[] {
 /**
  * Words rise from behind a mask as the block enters. The signature headline
  * treatment — heavier than a fade, still readable the whole way.
+ *
+ * Most headings this wraps also carry `.text-gradient`. See `textClipGradient`
+ * for why that combination needs care: the moving word must carry the gradient
+ * itself, because it no longer paints inside the heading's clip once it moves.
+ * With that handled, the travel stays on `transform`, which is the cheap
+ * compositor-only property this animation wants.
  */
 export function WordsUp({
   children,

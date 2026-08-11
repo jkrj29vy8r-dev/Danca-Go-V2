@@ -9,6 +9,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/reveal";
 import { Magnetic, TiltCard } from "@/components/motion/magnetic";
 import { WordsUp } from "@/components/motion/text-reveal";
+import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { featuredRoutes } from "@/lib/site";
 import { formatDuration, formatPrice } from "@/lib/utils";
 
@@ -16,7 +17,9 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function RoutesSection() {
   return (
-    <section className="container-page py-28 md:py-40">
+    <section className="relative overflow-hidden py-28 md:py-40">
+      <SectionAtmosphere align="right" />
+      <div className="container-page">
       <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
         <Reveal className="max-w-2xl">
           <Eyebrow>Rețeaua</Eyebrow>
@@ -115,6 +118,7 @@ export function RoutesSection() {
           </motion.li>
         ))}
       </motion.ul>
+      </div>
     </section>
   );
 }

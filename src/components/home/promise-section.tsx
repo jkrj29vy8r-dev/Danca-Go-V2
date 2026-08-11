@@ -1,6 +1,6 @@
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import { ScrollLines } from "@/components/motion/scroll-effects";
+import { ScrollLines, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { promises } from "@/lib/site";
 
 /**
@@ -10,7 +10,9 @@ import { promises } from "@/lib/site";
  */
 export function PromiseSection() {
   return (
-    <section className="container-page py-28 md:py-40">
+    <section className="relative overflow-hidden py-28 md:py-40">
+      <SectionAtmosphere align="centre" intensity={0.85} />
+      <div className="container-page">
       <Reveal className="max-w-3xl">
         <Eyebrow>De ce Danca Go</Eyebrow>
       </Reveal>
@@ -33,6 +35,7 @@ export function PromiseSection() {
           </RevealItem>
         ))}
       </RevealGroup>
+      </div>
     </section>
   );
 }

@@ -12,7 +12,7 @@ import {
 } from "@react-three/drei";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { Coach } from "./coach";
+import { Coach, type CoachDetail } from "./coach";
 import { DepthField } from "./depth-field";
 import { detectQuality, type QualitySettings } from "./quality";
 import { clamp } from "@/lib/utils";
@@ -47,19 +47,32 @@ export type CoachSceneProps = {
   className?: string;
 };
 
-/** Where the camera looks: roughly the middle of the coach's flank. */
-const TARGET = new THREE.Vector3(0, 1.7, 0);
+/**
+ * Viewing direction — a three-quarter front angle just under 3.5° above the
+ * target. Near eye-level is what makes a vehicle read as heroic; looking down
+ * on the roof makes it read as a toy.
+ *
+ * The y component is small because the camera's *height* is `TARGET.y + d·y`
+ * and the fit puts d at ~16m: at 0.13 that landed the camera at 4.13m, above
+ * the 3.93m roof, so the shot stared down at the roof panel — the exact
+ * failure this comment warns about. 0.06 holds it at ~3.0m, level with the
+ * glazing, which is where automotive photography puts it.
+ */
+const DIRECTION = new THREE.Vector3(0.78, 0.06, 0.61).normalize();
 
 /**
- * Viewing direction — a three-quarter front angle, only ~7° above the
- * beltline. Near eye-level is what makes a vehicle read as heroic; looking
- * down on the roof makes it read as a toy.
+ * The coach's envelope, as a **cylinder** rather than a box, in metres.
+ *
+ * The subject is on a continuous turntable, so any box-shaped frame is only
+ * correct at one heading. The swept envelope of a 12m × 2.55m body rotating
+ * about Y is a cylinder of radius √(6² + 1.275²) ≈ 6.13 — that number holds at
+ * every angle, which is what makes the fit below stable while the coach spins.
  */
-const DIRECTION = new THREE.Vector3(0.78, 0.13, 0.61).normalize();
-
-/** The coach's footprint plus breathing room, in metres. */
-const FRAME_WIDTH = 16.5;
-const FRAME_HEIGHT = 6.6;
+const SUBJECT_RADIUS = 6.15;
+/** Half the overall height: ground to the top of the roof cowling is ~4.1m. */
+const SUBJECT_HALF_HEIGHT = 2.1;
+/** Vertical centre of that envelope — also where the camera looks. */
+const TARGET = new THREE.Vector3(0, 2.05, 0);
 
 /* -------------------------------------------------------------------------- */
 /*                                   CAMERA                                    */
@@ -80,14 +93,25 @@ function CameraRig() {
 
   useEffect(() => {
     const aspect = width / Math.max(height, 1);
-    const halfFov = Math.tan((camera.fov * Math.PI) / 360);
+    const tanV = Math.tan((camera.fov * Math.PI) / 360);
+    const tanH = tanV * aspect;
 
-    const distanceForHeight = FRAME_HEIGHT / (2 * halfFov);
-    const distanceForWidth = FRAME_WIDTH / (2 * halfFov * aspect);
+    // Horizontal: the frustum has to clear the *tangent* of the swept
+    // cylinder, so this is a sine rather than the naive width / 2·tan — the
+    // widest part of the subject is not on the plane the camera looks at.
+    const sinH = tanH / Math.sqrt(1 + tanH * tanH);
+    const distanceForWidth = SUBJECT_RADIUS / sinH;
+
+    // Vertical: the top edge that crops first is the one nearest the camera,
+    // a full radius closer than the centre. Solving as if the subject were a
+    // flat plane at the target — which an earlier version did — under-counts
+    // by exactly that radius, and the roof and wheels get sliced off.
+    const distanceForHeight = SUBJECT_RADIUS + SUBJECT_HALF_HEIGHT / tanV;
+
     const distance = THREE.MathUtils.clamp(
-      Math.max(distanceForHeight, distanceForWidth),
-      11,
-      40,
+      Math.max(distanceForWidth, distanceForHeight),
+      9.5,
+      60,
     );
 
     camera.position.copy(DIRECTION).multiplyScalar(distance).add(TARGET);
@@ -118,10 +142,11 @@ function CoachRig({
   scrollInfluence,
   pointerInfluence,
   floatAmplitude,
+  detail,
 }: Required<Pick<
   CoachSceneProps,
   "autoRotate" | "scrollInfluence" | "pointerInfluence" | "floatAmplitude"
->>) {
+>> & { detail: CoachDetail }) {
   const outer = useRef<THREE.Group>(null);
   const inner = useRef<THREE.Group>(null);
   const spin = useRef(0);
@@ -168,7 +193,7 @@ function CoachRig({
       onPointerOut={() => setHovered(false)}
     >
       <group ref={inner}>
-        <Coach hovered={hovered} />
+        <Coach hovered={hovered} detail={detail} />
       </group>
     </group>
   );
@@ -181,22 +206,44 @@ function CoachRig({
 function StudioLighting({ quality }: { quality: QualitySettings }) {
   return (
     <>
-      <ambientLight intensity={0.7} />
+      {/* Deliberately low. The coach is a *dark* vehicle: its form should come
+          from reflected strips and edge highlights, not from flat fill. An
+          earlier pass raised this to 0.85 to stop the body reading as a black
+          box — but with the paint's metalness also corrected, that much
+          ambient washed it out into a pale silver bus instead. The fix for a
+          black box is reflections, not brightness. */}
+      <ambientLight intensity={0.22} />
 
       {/* Key light, camera-left and high */}
       <directionalLight
         position={[8, 12, 8]}
-        intensity={2.4}
+        intensity={1.4}
         castShadow={quality.shadows}
         shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0005}
+        // A directional light's default shadow frustum is a 10m box, which
+        // cuts straight through a 12m coach and leaves hard-edged rectangles
+        // on the ground where the shadow map simply stops.
+        shadow-camera-left={-11}
+        shadow-camera-right={11}
+        shadow-camera-top={11}
+        shadow-camera-bottom={-11}
+        shadow-camera-near={0.5}
+        shadow-camera-far={45}
       />
 
       {/* Gold rim along the top edge — the brand colour reading as light */}
-      <directionalLight position={[-10, 6, -6]} intensity={1.8} color="#c8a468" />
+      <directionalLight position={[-10, 6, -6]} intensity={1.2} color="#c8a468" />
+
+      {/* Hard back-rim from behind the far shoulder. This is what separates a
+          near-black vehicle from a near-black background: without an edge
+          catching light, the silhouette dissolves into the page. */}
+      <directionalLight position={[-6, 5, 9]} intensity={1.0} color="#dbe6ff" />
 
       {/* Cool fill from below-front, keeps the shadows from going muddy */}
-      <directionalLight position={[4, -2, 10]} intensity={0.55} color="#6f8cff" />
+      <directionalLight position={[4, -2, 10]} intensity={0.25} color="#6f8cff" />
+
+      <SweepLight />
 
       {/* `frames={1}` bakes the cube map once — the rig is static, so there's
           no reason to re-render it every frame. */}
@@ -206,27 +253,33 @@ function StudioLighting({ quality }: { quality: QualitySettings }) {
         {/* Large soft overhead softbox */}
         <Lightformer
           form="rect"
-          intensity={2.6}
+          intensity={1.5}
           position={[0, 8, 2]}
           rotation={[-Math.PI / 2, 0, 0]}
           scale={[14, 8, 1]}
         />
 
-        {/* Flank strips — the "is this metal or plastic" decider */}
-        <Lightformer form="rect" intensity={6} position={[0, 4.2, 9]} scale={[22, 0.7, 1]} />
-        <Lightformer form="rect" intensity={3.6} position={[0, 1.6, 9]} scale={[22, 0.35, 1]} />
+        {/* Flank strips — the "is this metal or plastic" decider.
+            Bright but *narrow* is the whole trick, and it took measuring
+            pixels to get right: glossy dark paint is a dark diffuse base
+            carrying a thin brilliant specular streak. Wide-and-dim gives a
+            flat matte flank (measured: median 31, p95 33 — no variation at
+            all); wide-and-bright turns the entire side into one reflection.
+            Narrow-and-bright is what actually reads as wet paint. */}
+        <Lightformer form="rect" intensity={7} position={[0, 4.2, 9]} scale={[20, 0.22, 1]} />
+        <Lightformer form="rect" intensity={4} position={[0, 1.7, 9]} scale={[20, 0.14, 1]} />
         <Lightformer
           form="rect"
-          intensity={2}
+          intensity={1.4}
           position={[0, 3, -9]}
           rotation={[0, Math.PI, 0]}
-          scale={[22, 1.2, 1]}
+          scale={[22, 1.0, 1]}
         />
 
         {/* Wraps the nose and front quarter, which the flank strips miss */}
         <Lightformer
           form="rect"
-          intensity={4}
+          intensity={2}
           position={[11, 3.4, 2]}
           rotation={[0, Math.PI / 2, 0]}
           scale={[10, 1.6, 1]}
@@ -253,7 +306,30 @@ function StudioLighting({ quality }: { quality: QualitySettings }) {
 }
 
 /**
- * Graded dome for the *environment map only*.
+ * A single light that tracks slowly along the flank.
+ *
+ * The environment cube map is baked once (`frames={1}`), which is what keeps
+ * the scene cheap — but it also means every reflection on the bodywork is
+ * frozen. A moving directional light is the affordable way to get the one
+ * thing a static bake cannot give: a highlight that travels, so the paint
+ * looks wet rather than painted-on. One light, no re-bake, no extra pass.
+ */
+function SweepLight() {
+  const light = useRef<THREE.DirectionalLight>(null);
+
+  useFrame((state) => {
+    const node = light.current;
+    if (!node) return;
+    const t = state.clock.elapsedTime * 0.18;
+    node.position.set(Math.cos(t) * 14, 7 + Math.sin(t * 0.7) * 2.5, Math.sin(t) * 14);
+  });
+
+  return <directionalLight ref={light} intensity={0.5} color="#ffffff" />;
+}
+
+/**
+ * Graded dome for the *environment map only*, carrying the studio's cyclorama
+ * light band.
  *
  * Pure black gives the clearcoat nothing to reflect in the gaps between the
  * lightformer strips, which is what flattens a car render. This restores that
@@ -264,6 +340,19 @@ function StudioLighting({ quality }: { quality: QualitySettings }) {
  * invisible to the camera. Put the same mesh in the scene graph and it just
  * paints an opaque box over the transparent canvas — which is exactly what
  * happened the first time.
+ *
+ * THE HORIZON BAND is the reason the flank has any tone at all. The rectangular
+ * <Lightformer> strips are fixed in space, but the coach is on a turntable, so
+ * they only line up with it at one heading — traced against the real camera,
+ * the bodyside reflected to x = −3.7 … −22.7 while the strips only spanned
+ * x ∈ [−10, 10], and the measured flank came back with a luminance range of
+ * **1** (p05 12, p95 13): flatter than the empty page behind it.
+ *
+ * A band built into the dome is radially symmetric, so it lands on the flank at
+ * every heading. It sits just *below* the horizon because that is where a
+ * vertical glossy panel sends a near-eye-level camera — the traced reflections
+ * all come back at direction.y ≈ −0.05. Being part of the dome, it is baked
+ * into the same one-off cube map and costs nothing per frame.
  */
 function GradientDome() {
   const material = useMemo(
@@ -274,21 +363,54 @@ function GradientDome() {
         uniforms: {
           top: { value: new THREE.Color("#14141a") },
           bottom: { value: new THREE.Color("#030304") },
+          band: { value: new THREE.Color("#eef2ff") },
+          warm: { value: new THREE.Color("#c8a468") },
         },
         vertexShader: `
-          varying float vH;
+          varying vec3 vDir;
           void main() {
             vec4 world = modelMatrix * vec4(position, 1.0);
-            vH = normalize(world.xyz).y;
+            vDir = normalize(world.xyz);
             gl_Position = projectionMatrix * viewMatrix * world;
           }
         `,
         fragmentShader: `
           uniform vec3 top;
           uniform vec3 bottom;
-          varying float vH;
+          uniform vec3 band;
+          uniform vec3 warm;
+          varying vec3 vDir;
+
           void main() {
-            gl_FragColor = vec4(mix(bottom, top, smoothstep(-0.25, 0.6, vH)), 1.0);
+            float h = vDir.y;
+            vec3 col = mix(bottom, top, smoothstep(-0.25, 0.6, h));
+
+            // Main cyclorama strip. Narrow and bright: glossy dark paint is a
+            // dark base carrying a thin brilliant streak, and a wide dim source
+            // just raises the whole panel to matte grey.
+            //
+            // Written as t*t rather than pow(t, 2.0) — t goes negative below
+            // the band's centre, and pow() with a negative base is undefined
+            // in GLSL.
+            float t = (h + 0.05) / 0.055;
+            float core = exp(-t * t);
+
+            // Azimuthal shaping so the streak has ends instead of ringing the
+            // subject evenly — a perfectly uniform ring reads as a painted-on
+            // line rather than a reflection of something.
+            float az = 0.45 + 0.55 * abs(vDir.z);
+            col += band * core * 1.25 * az;
+
+            // Warm kicker on the opposite side, carrying the brand gold into
+            // the reflection rather than only into the direct lights.
+            float g = (h + 0.02) / 0.11;
+            col += warm * exp(-g * g) * 0.55 * smoothstep(0.0, 0.7, -vDir.x);
+
+            // Soft shoulder band for the upper bodyside and roof radius.
+            float s = (h - 0.32) / 0.17;
+            col += band * exp(-s * s) * 0.22;
+
+            gl_FragColor = vec4(col, 1.0);
           }
         `,
       }),
@@ -358,6 +480,7 @@ export default function CoachScene({
             scrollInfluence={scrollInfluence}
             pointerInfluence={pointerInfluence}
             floatAmplitude={floatAmplitude}
+            detail={quality.tier === "high" ? "high" : "low"}
           />
 
           {/* Grounds the vehicle without rendering a floor plane. A real

@@ -351,6 +351,28 @@ export type FleetClass = {
   features: string[];
   /** Primary photo. Absent → VehiclePhoto renders its placeholder. */
   image?: string;
+  /**
+   * Set once `image` is a **background-removed PNG**.
+   *
+   * It switches `VehiclePhoto` from filling the frame (`object-cover`) to
+   * floating the vehicle on a lit stage — radial key light, elliptical
+   * contact shadow, horizon line — which is the configurator look the fleet
+   * section is built for.
+   *
+   * Leave it off for ordinary photographs. Turning it on for a photo that
+   * still has its background produces a rectangle hovering above a shadow,
+   * which looks worse than either treatment on its own.
+   *
+   * Two requirements on the source file, both verified against the stage:
+   *
+   *  1. Real alpha — an opaque PNG on a black rectangle is not a cut-out.
+   *  2. **Trimmed to the vehicle's bounding box.** The stage stands the vehicle
+   *     on its floor line by anchoring the image's bottom edge, and transparent
+   *     margin counts as part of that edge — so a cut-out exported on a roomy
+   *     canvas floats above its own contact shadow. Background removers usually
+   *     trim already; if not, `sharp(file).trim()` does it.
+   */
+  cutout?: boolean;
   /** Additional real photography for the fleet page gallery. */
   gallery?: { src: string; alt: string }[];
 };
