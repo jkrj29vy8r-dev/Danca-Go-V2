@@ -152,11 +152,17 @@ export function Navbar() {
             </ul>
 
             <div className="flex items-center gap-2">
+              {/* Previously a colour-only hover — the one link in the navbar
+                  that didn't share the pill background the nav items and the
+                  toggle button both get. */}
               <a
                 href={`tel:${site.phones[0]}`}
-                className="hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm text-ink-muted transition-colors duration-300 hover:text-ink md:inline-flex"
+                className="group/tel hidden items-center gap-2 rounded-full px-3.5 py-2 text-sm text-ink-muted transition-[color,background-color] duration-300 hover:bg-white/[0.06] hover:text-ink md:inline-flex"
               >
-                <Phone className="size-3.5" aria-hidden />
+                <Phone
+                  className="size-3.5 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/tel:rotate-12 group-hover/tel:text-accent"
+                  aria-hidden
+                />
                 <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>
               </a>
 
@@ -171,9 +177,27 @@ export function Navbar() {
                 aria-expanded={menuOpen}
                 aria-controls="meniu-mobil"
                 aria-label={menuOpen ? "Închide meniul" : "Deschide meniul"}
-                className="grid size-10 place-items-center rounded-full text-ink transition-colors duration-300 hover:bg-white/[0.07] lg:hidden"
+                className="grid size-10 place-items-center overflow-hidden rounded-full text-ink transition-colors duration-300 hover:bg-white/[0.07] lg:hidden"
               >
-                {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+                {/* Was an instant swap between the two icons — every other
+                    state change in the navbar (the active pill, the nav
+                    underline, the phone link) eases; this was the one that
+                    snapped. Rotating in from the direction it's headed
+                    (open -> closing tips right, closed -> opening tips left)
+                    reads as one icon turning into the other rather than two
+                    unrelated icons trading places. */}
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={menuOpen ? "close" : "open"}
+                    initial={{ rotate: menuOpen ? -90 : 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: menuOpen ? 90 : -90, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="grid place-items-center"
+                  >
+                    {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+                  </motion.span>
+                </AnimatePresence>
               </button>
             </div>
           </nav>
@@ -227,13 +251,18 @@ export function Navbar() {
                 <ButtonLink href="/rezervare" variant="accent" size="lg" className="w-full">
                   Rezervă un bilet
                 </ButtonLink>
+                {/* Previously the only links in the whole navbar with no
+                    interaction state at all — not even a colour shift. */}
                 {site.phones.map((phone) => (
                   <a
                     key={phone}
                     href={`tel:${phone}`}
-                    className="flex items-center justify-center gap-2 rounded-full border border-hairline py-3 text-sm text-ink-muted"
+                    className="group/tel flex items-center justify-center gap-2 rounded-full border border-hairline py-3 text-sm text-ink-muted transition-[color,border-color,background-color] duration-300 hover:border-hairline-strong hover:bg-white/[0.04] hover:text-ink active:scale-[0.98]"
                   >
-                    <Phone className="size-3.5" aria-hidden />
+                    <Phone
+                      className="size-3.5 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/tel:rotate-12 group-hover/tel:text-accent"
+                      aria-hidden
+                    />
                     <span className="tabular-nums">{phoneDisplay(phone)}</span>
                   </a>
                 ))}

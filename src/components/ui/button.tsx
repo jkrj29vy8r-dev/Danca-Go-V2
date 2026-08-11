@@ -18,7 +18,13 @@ const buttonVariants = cva(
     "font-medium tracking-[-0.01em] rounded-full select-none",
     "transition-[transform,background-color,border-color,color,box-shadow,opacity]",
     "duration-300 ease-[var(--ease-out-expo)]",
-    "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40",
+    // A soft lift on hover, a press on click. Previously the only scale state
+    // was the press — a button sat completely inert until the instant you
+    // clicked it, which reads as unresponsive on a site this otherwise alive.
+    // 1.015 is deliberately small: it's felt more than seen, which is the
+    // difference between "expensive" and "bouncy".
+    "hover:scale-[1.015] active:scale-[0.98]",
+    "disabled:pointer-events-none disabled:opacity-40 disabled:hover:scale-100",
     "[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:pointer-events-none",
     // Specular sweep on hover. Clipped to the pill, travels once, and is
     // purely decorative — pointer-events-none so it never eats a click.
@@ -37,13 +43,22 @@ const buttonVariants = cva(
         // Accent: the one gold moment per screen.
         accent:
           "bg-accent text-void hover:bg-accent-bright shadow-[0_1px_2px_rgb(0_0_0/0.5),0_8px_28px_-8px_rgb(200_164_104/0.55)]",
-        // Secondary: glass over dark, gradient hairline border.
+        // Secondary: glass over dark, gradient hairline border. The glow is
+        // a plain white bloom rather than gold — secondary buttons sit next
+        // to a primary or accent CTA in every real usage, and giving it the
+        // brand colour too would compete with whichever button is actually
+        // meant to lead.
         secondary: cn(
           "text-ink bg-white/[0.06] hover:bg-white/[0.10]",
           "border border-hairline hover:border-hairline-strong backdrop-blur-xl",
+          "hover:shadow-[0_8px_28px_-14px_rgb(255_255_255/0.22)]",
         ),
-        ghost: "text-ink-muted hover:text-ink hover:bg-white/[0.06]",
-        link: "text-ink-muted hover:text-ink underline-offset-4 hover:underline rounded-none px-0",
+        // Ghost carries the faintest version of the same glow — present, so
+        // "all buttons" is actually true, but restrained enough that a ghost
+        // button (always the lowest-emphasis action on screen) never reads
+        // as more important than the primary/secondary buttons beside it.
+        ghost: "text-ink-muted hover:text-ink hover:bg-white/[0.06] hover:shadow-[0_6px_20px_-14px_rgb(255_255_255/0.14)]",
+        link: "text-ink-muted hover:text-ink underline-offset-4 hover:underline rounded-none px-0 hover:scale-100 active:scale-100",
       },
       size: {
         sm: "h-9 px-4 text-[0.8125rem]",
