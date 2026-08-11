@@ -2,6 +2,7 @@ import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
 import { WordReveal } from "@/components/motion/word-reveal";
 import { Magnetic } from "@/components/motion/magnetic";
+import { HeroMotes } from "./hero-motes";
 import { SearchWidget } from "./search-widget";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, site } from "@/lib/site";
@@ -41,6 +42,10 @@ export function Hero() {
       */}
       <HeroScrim />
 
+      {/* Above the scrim so the motes aren't dimmed by it, below the type so
+          they never sit on top of a letterform. */}
+      <HeroMotes className="pointer-events-none absolute inset-0 z-10 overflow-hidden" />
+
       <div className="container-page relative z-20">
         <div className="flex justify-center">
           <div
@@ -58,13 +63,52 @@ export function Hero() {
           </div>
         </div>
 
-        <h1 className="mt-6 text-center text-display-xl text-gradient">
-          <WordReveal text="Drumul tău," delay={0.2} />
-          {/* <br> contributes no whitespace to textContent, so the two lines
-              would otherwise concatenate for screen readers and crawlers. */}
-          <br />{" "}
-          <WordReveal text="fără compromisuri." delay={0.34} />
-        </h1>
+        {/*
+          The shimmer is a *sibling* of the <h1>, inside a relative wrapper —
+          not a child of it. That is deliberate and load-bearing: the headline
+          carries `.text-gradient` (`background-clip: text; color: transparent`),
+          and a positioned descendant paints in a later stacking phase than its
+          ancestor's clipped background. Any text inside such a descendant
+          renders in the ancestor's declared colour, which here is
+          *transparent* — the exact mechanism that made 15 headings across this
+          site invisible earlier in the project. Keeping the overlay outside the
+          <h1> means the heading's own markup is untouched and cannot regress.
+        */}
+        <div className="relative mt-6">
+          <h1 className="text-center text-display-xl text-gradient">
+            <WordReveal text="Drumul tău," delay={0.2} />
+            {/* <br> contributes no whitespace to textContent, so the two lines
+                would otherwise concatenate for screen readers and crawlers. */}
+            <br />{" "}
+            <WordReveal text="fără compromisuri." delay={0.34} />
+          </h1>
+
+          {/* One pass of gold light across the headline, timed to land just
+              after the last word has risen. `watermark-drift` animates `left`
+              as a percentage of this wrapper, so the sweep crosses the full
+              headline regardless of its width — a `translateX` sweep would be
+              relative to the bar's own width and never reach the far edge.
+
+              Fill mode is `both`, not `backwards`. With `backwards` alone the
+              bar reverts to its un-animated state the moment the sweep ends —
+              and since it sets no static `left`, that means `left: auto`, i.e.
+              parked at the wrapper's left edge as a permanently visible pale
+              rectangle across the headline. `both` holds the end frame
+              (`left: 122%`) instead, which is off the right edge.
+
+              The mask softens the top and bottom edges: without it this is a
+              hard-cornered box of light rather than a beam. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 w-1/4 blur-[2px] mix-blend-overlay [animation:watermark-drift_2.6s_ease-in-out_1.15s_1_both]"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgb(255 245 220 / 0.55), transparent)",
+              maskImage:
+                "linear-gradient(to bottom, transparent, black 22%, black 78%, transparent)",
+            }}
+          />
+        </div>
 
         <p
           className="anim-rise mx-auto mt-6 max-w-xl text-center text-body-lg text-ink-muted"
@@ -201,9 +245,11 @@ function Backdrop() {
         }}
       />
 
-      {/* Horizon glow */}
+      {/* Horizon glow, breathing slowly. The period is deliberately long
+          (19s) and the amplitude small — at this scale the eye reads it as the
+          room having air in it, never as something animating. */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[55%]"
+        className="absolute inset-x-0 bottom-0 h-[55%] origin-bottom [animation:horizon-breathe_19s_ease-in-out_infinite]"
         style={{
           background:
             "radial-gradient(70% 100% at 50% 100%, rgb(200 164 104 / 0.10), transparent 70%)",

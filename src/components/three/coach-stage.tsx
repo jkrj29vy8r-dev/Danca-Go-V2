@@ -76,8 +76,18 @@ export function CoachStage({ className }: { className?: string }) {
       {shouldRender && quality ? (
         <div
           className={cn(
-            "absolute inset-0 transition-opacity duration-1000 ease-[var(--ease-out-expo)]",
-            ready ? "opacity-100" : "opacity-0",
+            "absolute inset-0",
+            // A settle, not a fade. The canvas eases down and back to rest
+            // rather than simply appearing at full opacity — the vehicle
+            // arrives and stops, which is a considerably stronger entrance
+            // than a crossfade for the same cost (both are compositor-only).
+            //
+            // `backwards` holds the from-state through the delay, so there is
+            // no frame where the canvas is briefly visible at its final
+            // position before the animation takes over.
+            ready
+              ? "[animation:coach-settle_1.4s_var(--ease-out-expo)_backwards]"
+              : "opacity-0",
           )}
         >
           <CoachScene quality={quality} />

@@ -132,6 +132,50 @@
   to   { left: 122%; }
 }
 
+/* One airborne mote in the hero: rises, drifts sideways a little, fades in and
+   back out. Per-dot variation comes from custom properties set inline
+   (`--mote-dx`, `--mote-peak`) plus a per-dot duration and negative delay, so a
+   single keyframe drives the whole field without any two dots moving alike.
+
+   The negative delays matter: they start each mote already partway through its
+   cycle, so the field is mid-drift on first paint instead of every dot
+   launching from the floor in unison the moment the page loads. */
+@keyframes mote-rise {
+  0% {
+    transform: translate3d(0, 14px, 0) scale(0.8);
+    opacity: 0;
+  }
+  22%, 72% {
+    opacity: var(--mote-peak, 0.5);
+  }
+  100% {
+    transform: translate3d(var(--mote-dx, 8px), -38px, 0) scale(1.06);
+    opacity: 0;
+  }
+}
+
+/* The hero canvas arriving: it settles down and back rather than just fading.
+   Scaling *down* to rest (1.045 -> 1) reads as the vehicle coming to a stop
+   in front of you; scaling up would read as a zoom-in on a photo. */
+@keyframes coach-settle {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(1.045);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Slow swell on the hero's horizon light. Wider and far slower than
+   `glow-pulse` — this is the room breathing, not an element pulsing, so the
+   period is long enough that you never catch it repeating. */
+@keyframes horizon-breathe {
+  0%, 100% { opacity: 0.75; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.08); }
+}
+
 /* A warm glow that blooms and fades around a number the instant it finishes
    counting up (see `CountUp`). This is a `text-shadow` pulse rather than the
    overlay-bar sweep used elsewhere, and that's a hard requirement, not a

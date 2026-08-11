@@ -110,6 +110,15 @@ function CameraRig() {
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
 
+  /**
+   * The solved resting position. The drift below is applied *relative* to this
+   * rather than written straight onto the camera, so the two never fight: the
+   * fit owns where the camera belongs, the drift owns how far it wanders from
+   * there.
+   */
+  const base = useRef(new THREE.Vector3());
+  const aim = useRef(new THREE.Vector3());
+
   useEffect(() => {
     const aspect = width / Math.max(height, 1);
     const tanV = Math.tan((camera.fov * Math.PI) / 360);
@@ -133,10 +142,54 @@ function CameraRig() {
       60,
     );
 
-    camera.position.copy(DIRECTION).multiplyScalar(distance).add(TARGET);
+    base.current.copy(DIRECTION).multiplyScalar(distance).add(TARGET);
+    camera.position.copy(base.current);
     camera.lookAt(TARGET);
     camera.updateProjectionMatrix();
   }, [camera, width, height]);
+
+  /**
+   * A slow wander around the resting position.
+   *
+   * The turntable spins the coach about its own Y axis, which changes what you
+   * see of the *vehicle* but not where the vehicle sits relative to anything
+   * behind it — the backdrop, the motes, the horizon band all stay locked. That
+   * is what made the scene read as a rotating object rather than a filmed one.
+   * Moving the camera instead produces real parallax: near and far separate as
+   * it travels.
+   *
+   * Amplitudes are deliberately small — and bounded by more than taste. The
+   * camera fit leaves `FRAME_MARGIN` (8%) of headroom around the subject, and
+   * that margin is already shared with the vehicle's float and the pointer
+   * parallax. A lateral camera shift of `d` swings the subject across the frame
+   * by roughly `d / distance` radians against a ~18° half-FOV, so 0.34m at a
+   * 20m throw would eat about two thirds of the margin on its own, and more
+   * than that on a narrower viewport where the horizontal FOV is tighter.
+   * 0.18m keeps it comfortably inside on every breakpoint while still reading
+   * as parallax against the fixed page backdrop, which is where the effect
+   * actually lands.
+   *
+   * The three periods (17s, 23s, 29s) share no common factor, so the path never
+   * visibly repeats, and the aim point drifts on its own separate periods so
+   * the motion isn't a clean orbit.
+   */
+  useFrame((state) => {
+    if (base.current.lengthSq() === 0) return;
+    const t = state.clock.elapsedTime;
+
+    camera.position.set(
+      base.current.x + Math.sin(t / 17) * 0.18,
+      base.current.y + Math.sin(t / 23) * 0.12,
+      base.current.z + Math.cos(t / 29) * 0.2,
+    );
+
+    aim.current.set(
+      TARGET.x + Math.sin(t / 31) * 0.06,
+      TARGET.y + Math.cos(t / 19) * 0.045,
+      TARGET.z,
+    );
+    camera.lookAt(aim.current);
+  });
 
   return null;
 }
