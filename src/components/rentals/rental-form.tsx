@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea } from "@/components/ui/input";
+import { Magnetic } from "@/components/motion/magnetic";
 import { rentalSchema, type RentalInput, type RequestKindInput } from "@/lib/schemas";
 import { submitRental } from "@/app/inchirieri/actions";
 import { eventTypes } from "@/lib/site";
@@ -235,26 +236,28 @@ export function RentalForm({
         />
       </Field>
 
-      <Button
-        type="submit"
-        variant="accent"
-        size="lg"
-        disabled={isSubmitting}
-        aria-busy={isSubmitting || undefined}
-        className="group mt-2 self-start"
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-            Se trimite…
-          </>
-        ) : (
-          <>
-            Solicită ofertă
-            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </>
-        )}
-      </Button>
+      <Magnetic strength={0.2} className="mt-2 self-start">
+        <Button
+          type="submit"
+          variant="accent"
+          size="lg"
+          disabled={isSubmitting}
+          aria-busy={isSubmitting || undefined}
+          className="group"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+              Se trimite…
+            </>
+          ) : (
+            <>
+              Solicită ofertă
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </>
+          )}
+        </Button>
+      </Magnetic>
 
       <p className="text-xs leading-relaxed text-ink-dim">
         Îți răspundem în cel mult 24 de ore. Nu trimitem newslettere și nu

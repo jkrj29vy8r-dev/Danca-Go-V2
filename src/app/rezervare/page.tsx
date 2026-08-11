@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
 import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { Magnetic } from "@/components/motion/magnetic";
 import { searchTrips } from "@/lib/queries";
 import { featuredRoutes, phoneDisplay, site } from "@/lib/site";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
@@ -123,15 +124,17 @@ export default async function BookingPage({
                           </span>
                         </span>
 
-                        <ButtonLink
-                          href={`/rezervare/${trip.id}?seats=${seats}`}
-                          variant="accent"
-                          size="md"
-                          className="group shrink-0"
-                        >
-                          Alege
-                          <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-                        </ButtonLink>
+                        <Magnetic strength={0.2} className="shrink-0">
+                          <ButtonLink
+                            href={`/rezervare/${trip.id}?seats=${seats}`}
+                            variant="accent"
+                            size="md"
+                            className="group"
+                          >
+                            Alege
+                            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+                          </ButtonLink>
+                        </Magnetic>
                       </div>
                     </article>
                   </Card>

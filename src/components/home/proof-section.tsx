@@ -18,7 +18,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
  */
 export function ProofSection() {
   return (
-    <section className="relative overflow-hidden border-t border-hairline py-28 md:py-40">
+    <section className="relative overflow-hidden py-28 md:py-40">
       <Parallax speed={0.25} className="pointer-events-none absolute inset-0 -z-10">
         <div
           className="absolute inset-0"

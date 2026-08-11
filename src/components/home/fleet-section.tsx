@@ -46,7 +46,7 @@ export function FleetSection() {
   return (
     <section
       ref={container}
-      className="relative border-t border-hairline"
+      className="relative"
       style={{ height: `${fleet.length * 100}vh` }}
       aria-label="Flota Danca Go"
     >
@@ -140,7 +140,7 @@ export function FleetSection() {
                 exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
                 transition={{ duration: 0.8, ease: EASE }}
               >
-                <VehiclePhoto vehicle={vehicle} />
+                <VehiclePhoto vehicle={vehicle} kenBurns />
               </motion.div>
             </AnimatePresence>
 

@@ -28,10 +28,18 @@ export function VehiclePhoto({
   vehicle,
   className,
   priority = false,
+  kenBurns = false,
 }: {
   vehicle: FleetClass;
   className?: string;
   priority?: boolean;
+  /**
+   * A slow, continuous scale drift while the photo is on screen — the "camera
+   * is still rolling" cue. Reserved for the one or two largest product shots
+   * on the page (the fleet section's pinned panel); on a grid of six cards it
+   * would read as six things twitching at once rather than as ambient life.
+   */
+  kenBurns?: boolean;
 }) {
   const isCutout = vehicle.cutout === true;
 
@@ -46,33 +54,43 @@ export function VehiclePhoto({
       {isCutout && <VehicleStage />}
 
       {vehicle.image ? (
-        <Image
-          src={vehicle.image}
-          alt={`${vehicle.name} din flota Danca Go, fotografiat în exterior`}
-          fill
-          priority={priority}
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className={cn(
-            "transition-transform duration-[1.2s] ease-[var(--ease-out-expo)]",
-            isCutout
-              ? // `contain` so a cut-out vehicle is never cropped — the
-                // silhouette is the whole point — and `object-bottom` so it
-                // rests on the floor line instead of floating in the middle of
-                // the frame. Without the bottom anchor, a wide source image is
-                // width-constrained and centres vertically, leaving the wheels
-                // hovering above their own contact shadow.
-                //
-                // The vertical padding is scaled by 10/16 because **percentage
-                // padding resolves against the containing block's width, even
-                // on the top and bottom edges** — while the stage's `bottom-*`
-                // offsets resolve against its height. Writing a bare `pb-[14%]`
-                // here lands the vehicle at 77% down a 16:10 frame, ~9 points
-                // short of the FLOOR line the shadow is drawn on. The calc
-                // keeps both halves reading in the same units.
-                "object-contain object-bottom px-[7%] pt-[calc(9%*10/16)] pb-[calc(14%*10/16)] drop-shadow-[0_28px_44px_rgba(0,0,0,0.7)] group-hover/photo:-translate-y-1 group-hover/photo:scale-[1.02]"
-              : "object-cover group-hover/photo:scale-[1.04]",
-          )}
-        />
+        // The drift and the hover-scale each animate their own element's
+        // `transform` rather than sharing one. A CSS `animation` fully
+        // overrides the `transform` property while it's running, so a single
+        // element carrying both the ken-burns keyframe and a `group-hover`
+        // scale utility would have the hover state silently overridden by
+        // whichever frame of the drift was current — the photo would stop
+        // responding to hover at all once the drift started. Two nested
+        // transforms compose normally; there's nothing to fight over.
+        <div className={cn("absolute inset-0", kenBurns && !isCutout && "anim-ken-burns will-change-transform")}>
+          <Image
+            src={vehicle.image}
+            alt={`${vehicle.name} din flota Danca Go, fotografiat în exterior`}
+            fill
+            priority={priority}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className={cn(
+              "transition-transform duration-[1.2s] ease-[var(--ease-out-expo)]",
+              isCutout
+                ? // `contain` so a cut-out vehicle is never cropped — the
+                  // silhouette is the whole point — and `object-bottom` so it
+                  // rests on the floor line instead of floating in the middle of
+                  // the frame. Without the bottom anchor, a wide source image is
+                  // width-constrained and centres vertically, leaving the wheels
+                  // hovering above their own contact shadow.
+                  //
+                  // The vertical padding is scaled by 10/16 because **percentage
+                  // padding resolves against the containing block's width, even
+                  // on the top and bottom edges** — while the stage's `bottom-*`
+                  // offsets resolve against its height. Writing a bare `pb-[14%]`
+                  // here lands the vehicle at 77% down a 16:10 frame, ~9 points
+                  // short of the FLOOR line the shadow is drawn on. The calc
+                  // keeps both halves reading in the same units.
+                  "object-contain object-bottom px-[7%] pt-[calc(9%*10/16)] pb-[calc(14%*10/16)] drop-shadow-[0_28px_44px_rgba(0,0,0,0.7)] group-hover/photo:-translate-y-1 group-hover/photo:scale-[1.02]"
+                : "object-cover group-hover/photo:scale-[1.04]",
+            )}
+          />
+        </div>
       ) : (
         <PhotoPlaceholder label={vehicle.name} />
       )}

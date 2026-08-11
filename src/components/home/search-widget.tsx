@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowUpDown, CalendarDays, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Magnetic } from "@/components/motion/magnetic";
 import { searchOrigins } from "@/lib/site";
 import { cn, toDateKey } from "@/lib/utils";
 
@@ -133,18 +134,19 @@ export function SearchWidget({
           </select>
         </Field>
 
-        <Button
-          type="submit"
-          variant="accent"
-          size="lg"
-          className={cn(
-            "group col-span-2 h-13 w-full md:col-span-1 md:w-auto md:px-7",
-            isDock && "md:ml-4",
-          )}
+        {/* The grid-placement classes live on the Magnetic wrapper, not the
+            Button — Magnetic renders the actual grid item (a <span>), so the
+            column span and margin have to land there or the button would
+            collapse to its content width inside an unconstrained cell. */}
+        <Magnetic
+          strength={0.2}
+          className={cn("col-span-2 md:col-span-1", isDock && "md:ml-4")}
         >
-          Caută curse
-          <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-        </Button>
+          <Button type="submit" variant="accent" size="lg" className="group h-13 w-full md:w-auto md:px-7">
+            Caută curse
+            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+          </Button>
+        </Magnetic>
       </div>
     </form>
   );

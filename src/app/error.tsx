@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { Magnetic } from "@/components/motion/magnetic";
 import { phoneDisplay, site } from "@/lib/site";
 
 /**
@@ -40,10 +41,12 @@ export default function GlobalPageError({
       </p>
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-        <Button type="button" variant="primary" size="lg" onClick={reset}>
-          <RotateCcw className="size-4" aria-hidden />
-          Încearcă din nou
-        </Button>
+        <Magnetic strength={0.22}>
+          <Button type="button" variant="primary" size="lg" onClick={reset}>
+            <RotateCcw className="size-4" aria-hidden />
+            Încearcă din nou
+          </Button>
+        </Magnetic>
         <ButtonLink href="/" variant="secondary" size="lg">
           Prima pagină
         </ButtonLink>

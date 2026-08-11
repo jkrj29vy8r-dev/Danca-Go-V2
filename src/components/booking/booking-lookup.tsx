@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { lookupBooking, type BookingDetails } from "@/app/rezervare/[tripId]/actions";
 import { bookingLookupSchema, type BookingLookupInput } from "@/lib/schemas";
+import { Magnetic } from "@/components/motion/magnetic";
 import { phoneDisplay, site } from "@/lib/site";
 import { cn, formatDateRo, formatPrice, formatTime } from "@/lib/utils";
 import type { BookingStatus, PaymentStatus } from "@/lib/types/database";
@@ -99,26 +100,27 @@ export function BookingLookup() {
           </label>
         </div>
 
-        <Button
-          type="submit"
-          variant="accent"
-          size="lg"
-          disabled={isSubmitting}
-          aria-busy={isSubmitting || undefined}
-          className="self-start"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-              Se caută…
-            </>
-          ) : (
-            <>
-              <Search className="size-4" aria-hidden />
-              Caută rezervarea
-            </>
-          )}
-        </Button>
+        <Magnetic strength={0.2} className="self-start">
+          <Button
+            type="submit"
+            variant="accent"
+            size="lg"
+            disabled={isSubmitting}
+            aria-busy={isSubmitting || undefined}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                Se caută…
+              </>
+            ) : (
+              <>
+                <Search className="size-4" aria-hidden />
+                Caută rezervarea
+              </>
+            )}
+          </Button>
+        </Magnetic>
       </form>
 
       {/* Persistent live region: a screen reader only picks up content that

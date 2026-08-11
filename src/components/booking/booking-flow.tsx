@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Baby, Check, Clock, Loader2, Users } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
+import { Magnetic } from "@/components/motion/magnetic";
 import { createBooking } from "@/app/rezervare/[tripId]/actions";
 import { passengerDetailsSchema, type PassengerDetailsInput } from "@/lib/schemas";
 import { activeProvider, paymentCopy } from "@/lib/payments";
@@ -370,10 +371,12 @@ function PassengerStep({
           <span className="text-xl font-medium tabular-nums text-ink">{formatPrice(total)}</span>
         </span>
 
-        <Button type="submit" variant="accent" size="lg" className="group w-full sm:w-auto">
-          Continuă
-          <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-        </Button>
+        <Magnetic strength={0.2} className="w-full sm:w-auto">
+          <Button type="submit" variant="accent" size="lg" className="group w-full sm:w-auto">
+            Continuă
+            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+          </Button>
+        </Magnetic>
       </div>
     </form>
   );
@@ -465,27 +468,29 @@ function ReviewStep({
             Înapoi
           </Button>
 
-          <Button
-            type="button"
-            variant="accent"
-            size="lg"
-            onClick={onConfirm}
-            disabled={submitting}
-            aria-busy={submitting || undefined}
-            className="group"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-                Se confirmă…
-              </>
-            ) : (
-              <>
-                Confirmă rezervarea
-                <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-              </>
-            )}
-          </Button>
+          <Magnetic strength={0.2}>
+            <Button
+              type="button"
+              variant="accent"
+              size="lg"
+              onClick={onConfirm}
+              disabled={submitting}
+              aria-busy={submitting || undefined}
+              className="group"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  Se confirmă…
+                </>
+              ) : (
+                <>
+                  Confirmă rezervarea
+                  <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+                </>
+              )}
+            </Button>
+          </Magnetic>
         </div>
       </div>
 

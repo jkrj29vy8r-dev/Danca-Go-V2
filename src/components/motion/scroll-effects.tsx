@@ -334,3 +334,90 @@ export function CountUp({
     </span>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                    SEAM                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The boundary between two homepage sections, drawn rather than left as a
+ * stylesheet default.
+ *
+ * Most section boundaries on the page were nothing at all — no border, no
+ * transition, just one background handing off to the next because the section
+ * above happened to end. The two that did have something (`fleet-section`,
+ * `proof-section`) had a plain `border-t border-hairline`, which is correct as
+ * a rule but reads as a CSS reset line rather than a considered edge — the
+ * kind of thing you'd only notice if it were missing, never because it's there.
+ *
+ * This replaces both cases with the same designed transition: the hairline
+ * fades in as the seam nears the viewport, and a narrow gold band sweeps once
+ * from edge to edge across it, like a beam finding the seam between two panels
+ * of brushed metal. `left` is animated as a bare percentage rather than a
+ * pixel offset or `xPercent` — `xPercent` scales against the *bar's own*
+ * width, not the seam's, so it can't be made to travel the full width of an
+ * arbitrary container without knowing that width up front; a percentage `left`
+ * on an absolutely-positioned element always means "this far across the
+ * parent", which is exactly the guarantee needed here.
+ *
+ * Deliberately not used adjacent to `CityMarquee`: that section already carries
+ * its own `border-y` as part of the ticker-strip's own design, and a second
+ * line immediately next to it would read as a mistake rather than a flourish.
+ */
+export function SectionSeam() {
+  const root = useRef<HTMLDivElement>(null);
+  const line = useRef<HTMLDivElement>(null);
+  const glimmer = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const rootNode = root.current;
+    const lineNode = line.current;
+    const glimmerNode = glimmer.current;
+    if (!rootNode || !lineNode || !glimmerNode) return;
+
+    if (prefersReducedMotion()) {
+      lineNode.style.opacity = "1";
+      return;
+    }
+
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        lineNode,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 1,
+          ease: "power1.out",
+          scrollTrigger: { trigger: rootNode, start: "top 90%", once: true },
+        },
+      );
+
+      gsap.fromTo(
+        glimmerNode,
+        { left: "-16%" },
+        {
+          left: "116%",
+          duration: 1.6,
+          ease: "power2.inOut",
+          scrollTrigger: { trigger: rootNode, start: "top 85%", once: true },
+        },
+      );
+    }, rootNode);
+
+    return () => context.revert();
+  }, []);
+
+  return (
+    <div ref={root} aria-hidden className="relative h-px w-full overflow-hidden">
+      <div ref={line} className="absolute inset-0 bg-hairline opacity-0" />
+      <div
+        ref={glimmer}
+        className="absolute inset-y-0 w-40 -translate-x-1/2 blur-[1px]"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgb(200 164 104 / 0.9), transparent)",
+        }}
+      />
+    </div>
+  );
+}

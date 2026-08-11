@@ -1,6 +1,7 @@
 import { ArrowRight, Bus, Star } from "lucide-react";
 import { CoachStage } from "@/components/three/coach-stage";
 import { WordReveal } from "@/components/motion/word-reveal";
+import { Magnetic } from "@/components/motion/magnetic";
 import { SearchWidget } from "./search-widget";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, site } from "@/lib/site";
@@ -77,25 +78,33 @@ export function Hero() {
           className="anim-rise mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row"
           style={{ animationDelay: "0.85s" }}
         >
-          <ButtonLink
-            href="/rezervare"
-            variant="primary"
-            size="lg"
-            className="group w-full sm:w-auto"
-          >
-            Rezervă bilet
-            <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
-          </ButtonLink>
+          {/* The two highest-stakes conversion actions on the whole site, and
+              until now the only primary/accent CTAs anywhere that weren't
+              wrapped in Magnetic — every other one (cta-section, fleet-section,
+              faq, cariere) already pulls toward the cursor. */}
+          <Magnetic strength={0.22} className="w-full sm:w-auto">
+            <ButtonLink
+              href="/rezervare"
+              variant="primary"
+              size="lg"
+              className="group w-full sm:w-auto"
+            >
+              Rezervă bilet
+              <ArrowRight className="size-4 transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1" />
+            </ButtonLink>
+          </Magnetic>
 
-          <ButtonLink
-            href="/inchirieri"
-            variant="secondary"
-            size="lg"
-            className="w-full sm:w-auto"
-          >
-            <Bus className="size-4" aria-hidden />
-            Închiriază autocar
-          </ButtonLink>
+          <Magnetic strength={0.22} className="w-full sm:w-auto">
+            <ButtonLink
+              href="/inchirieri"
+              variant="secondary"
+              size="lg"
+              className="w-full sm:w-auto"
+            >
+              <Bus className="size-4" aria-hidden />
+              Închiriază autocar
+            </ButtonLink>
+          </Magnetic>
         </div>
       </div>
 

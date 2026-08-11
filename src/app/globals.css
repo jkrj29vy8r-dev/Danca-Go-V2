@@ -102,6 +102,23 @@
   50% { opacity: 0.6; }
 }
 
+/* A diagonal band travelling left to right, used as a one-shot mount sweep
+   and as the hover sweep on the logo. Driving `translateX` on a wide skewed
+   bar rather than `background-position` keeps this on the compositor. */
+@keyframes shimmer-sweep {
+  from { transform: translateX(-160%) skewX(-20deg); }
+  to   { transform: translateX(220%) skewX(-20deg); }
+}
+
+/* Slow scale drift for a displayed photo — the "the camera is still rolling"
+   cue. Deliberately small (1 -> 1.045): anything larger reads as a hover
+   zoom rather than ambient life, and this has to loop for as long as the
+   photo is on screen. */
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.045); }
+}
+
 /* Radix measures the panel and exposes its height as a custom property, which
    is the only way to ease to `auto` without capping long answers at a guessed
    max-height. */
@@ -227,6 +244,13 @@
 @utility anim-word {
   display: inline-block;
   animation: word-rise 1s var(--ease-out-expo) backwards;
+}
+
+/* Slow, continuous — a displayed photo that never quite sits still.
+   `alternate infinite` rather than a one-shot: this rides on a component that
+   can stay mounted for as long as a vehicle is selected in the fleet panel. */
+@utility anim-ken-burns {
+  animation: ken-burns 22s ease-in-out infinite alternate;
 }
 
 @utility grain {

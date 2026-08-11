@@ -22,7 +22,7 @@ export function VehicleGallery({
 
   return (
     <div className="flex flex-col gap-3">
-      <VehiclePhoto vehicle={vehicle} priority={priority} />
+      <VehiclePhoto vehicle={vehicle} priority={priority} kenBurns />
 
       {gallery.length > 0 && (
         // A lone final tile spans the row rather than leaving a hole, so the
