@@ -446,6 +446,73 @@ function GradientDome() {
 }
 
 /* -------------------------------------------------------------------------- */
+/*                                    FLOOR                                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The ground under the vehicle: a soft pool of sheen, not a mirror.
+ *
+ * A real `MeshReflectorMaterial` floor was built here and cut, for the second
+ * time in this scene's history. The problem is not the material, it is that
+ * this rig is a *floating studio* — strong coloured rim lights and an
+ * environment whose brightest feature sits on the horizon — and a large
+ * horizontal plane amplifies exactly those. Three configurations were tried
+ * and each produced the same flat tan plane with a hard horizon:
+ *
+ *   diffuse (metalness 0.62)  — the warm lights lit the plane directly
+ *   metalness 1               — it then reflected the env map's horizon band
+ *   + envMapIntensity 0.06    — the gold rim light's broad specular lobe
+ *                               smeared across it instead
+ *
+ * Each fix removed one path and the light found another. So this drops the
+ * reflection buffer entirely and states the intent directly: an unlit additive
+ * quad, radial falloff, sitting just above the ground plane. It cannot pick up
+ * a stray light because it does not respond to light at all.
+ *
+ * It also costs a single quad instead of a second render of the scene, which
+ * is why it can run on every tier — mobile gets it too, where the reflective
+ * version would never have been affordable.
+ */
+function GroundSheen() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gradient.addColorStop(0, "rgba(255,255,255,0.85)");
+      gradient.addColorStop(0.35, "rgba(255,255,255,0.30)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 128, 128);
+    }
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    return map;
+  }, []);
+
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0]} renderOrder={0}>
+      {/* Squashed along the vehicle's length so the pool reads as lying under
+          a 12m object rather than as a circle it happens to sit on. */}
+      <planeGeometry args={[34, 15]} />
+      <meshBasicMaterial
+        map={texture}
+        alphaMap={texture}
+        color="#6f6552"
+        transparent
+        opacity={0.5}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                    SCENE                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -504,10 +571,12 @@ export default function CoachScene({
             detail={quality.tier === "high" ? "high" : "low"}
           />
 
-          {/* Grounds the vehicle without rendering a floor plane. A real
-              reflective floor was tried and cut: it read as a hard-edged grey
-              stage rather than asphalt, and its per-frame blur was the single
-              most expensive thing in the scene. */}
+          {/* Reads as a polished surface catching light under the vehicle.
+              See `GroundSheen` for why this is not a reflective floor. */}
+          <GroundSheen />
+
+          {/* Contact is a separate job from sheen: the pool says "polished
+              ground", the shadow says "the tyres are touching it". */}
           <ContactShadows
             position={[0, 0.015, 0]}
             opacity={0.8}

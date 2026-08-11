@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -280,6 +280,32 @@ export function Coach({
     return geometry;
   }, []);
 
+  /**
+   * A soft radial falloff, painted once into a 128px canvas.
+   *
+   * Used as both `map` and `alphaMap` on the headlight ground pool. Generating
+   * it locally keeps the promise the rest of this scene makes: no external
+   * asset requests, nothing to 404, nothing for a CSP to block.
+   */
+  const falloff = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gradient.addColorStop(0, "rgba(255,255,255,1)");
+      gradient.addColorStop(0.45, "rgba(255,255,255,0.42)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 128, 128);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, []);
+
+  useEffect(() => () => falloff.dispose(), [falloff]);
+
   useFrame((state, delta) => {
     // Wheels idle-spin, faster on hover — sells "this thing moves".
     const speed = hovered ? 6 : 1.6;
@@ -513,6 +539,38 @@ export function Coach({
           <capsuleGeometry args={[0.07, 0.42, 4, 12]} />
         </mesh>
       ))}
+
+      {/* No volumetric beam cones here, deliberately. Additive cones were
+          tried: without a participating-medium shader they render as flat
+          translucent quads with visible silhouette edges — the geometry reads
+          instead of the light — and at this three-quarter angle they point
+          out of frame anyway. The ground pool below does the whole job of
+          saying "the lamps are on" for one unsorted draw call. */}
+
+      {/* Pool of light the lamps throw onto the floor ahead of the vehicle.
+          The falloff comes from a radial-gradient texture rather than the
+          geometry: a flat-opacity disc has a hard rim and reads as a painted
+          blue ellipse on the ground, not as light. */}
+      {detail === "high" && (
+        <mesh
+          position={[BODY_LENGTH / 2 + 2.9, 0.012, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          scale={[1, 0.62, 1]}
+          renderOrder={1}
+        >
+          <planeGeometry args={[7.4, 7.4]} />
+          <meshBasicMaterial
+            map={falloff}
+            alphaMap={falloff}
+            color="#8ea9e8"
+            transparent
+            opacity={0.34}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      )}
 
       {[HALF_WIDTH - 0.44, -HALF_WIDTH + 0.44].map((z) => (
         <mesh

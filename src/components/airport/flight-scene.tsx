@@ -28,6 +28,29 @@ if (typeof window !== "undefined") {
 /** The route, in the SVG's own coordinate space. */
 const ARC = "M 196 336 C 430 152, 760 78, 1012 150";
 
+/** Aircraft glyph, drawn nose-along-+X so a path tangent is its rotation. */
+const PLANE =
+  "M22.5 9.6 L13.4 9.0 L7.2 1.2 L4.6 1.2 L7.6 9.0 L3.4 8.9 L1.5 6.4 L0 6.4 L1.1 9.6 L0 12.8 L1.5 12.8 L3.4 10.3 L7.6 10.2 L4.6 18 L7.2 18 L13.4 10.2 L22.5 9.6 Z";
+
+/**
+ * Background traffic, at three depths.
+ *
+ * The section is about an airport, and one aircraft on one arc reads as a
+ * diagram. A few more crossing at different scales and speeds turns the panel
+ * into *airspace* — and because the parallax is carried by scale and rate
+ * rather than by any extra machinery, the whole effect is three more copies of
+ * one path.
+ *
+ * `y` is where the lane sits, `scale` sets apparent distance, `duration` is
+ * seconds for a full crossing (further away means slower across the frame),
+ * and `delay` staggers them so they never line up into a formation.
+ */
+const TRAFFIC = [
+  { y: 96, scale: 0.42, duration: 46, delay: 0, opacity: 0.2, drift: -1 },
+  { y: 250, scale: 0.62, duration: 34, delay: -12, opacity: 0.3, drift: 1 },
+  { y: 382, scale: 0.85, duration: 26, delay: -21, opacity: 0.16, drift: 1 },
+] as const;
+
 const VIEW_W = 1200;
 const VIEW_H = 420;
 
@@ -48,6 +71,41 @@ export function FlightScene({
   const path = useRef<SVGPathElement>(null);
   const plane = useRef<SVGGElement>(null);
   const trail = useRef<SVGPathElement>(null);
+  const traffic = useRef<(SVGGElement | null)[]>([]);
+
+  // Background traffic runs on its own clock — it is ambient, not narrative,
+  // so it must keep moving whether or not the reader is scrolling.
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+
+    const context = gsap.context(() => {
+      TRAFFIC.forEach((lane, index) => {
+        const node = traffic.current[index];
+        if (!node) return;
+
+        // Start off one edge and run to the other, then wrap. The extra 200
+        // units on each side keep the wrap off-screen at every container
+        // aspect, including the 1.78:1 phone case where the SVG is
+        // letterboxed and the viewBox edges sit inside the panel.
+        const from = lane.drift > 0 ? -220 : VIEW_W + 220;
+        const to = lane.drift > 0 ? VIEW_W + 220 : -220;
+
+        gsap.fromTo(
+          node,
+          { x: from },
+          {
+            x: to,
+            duration: lane.duration,
+            delay: lane.delay,
+            ease: "none",
+            repeat: -1,
+          },
+        );
+      });
+    }, root);
+
+    return () => context.revert();
+  }, []);
 
   useEffect(() => {
     const rootNode = root.current;
@@ -161,6 +219,25 @@ export function FlightScene({
           </radialGradient>
         </defs>
 
+        {/* Background traffic, behind the route so it never competes with it. */}
+        {TRAFFIC.map((lane, index) => (
+          <g
+            key={lane.y}
+            ref={(node) => {
+              traffic.current[index] = node;
+            }}
+          >
+            <g
+              transform={`translate(0 ${lane.y}) scale(${lane.scale}) ${
+                lane.drift > 0 ? "" : "scale(-1 1)"
+              }`}
+              opacity={lane.opacity}
+            >
+              <path d={PLANE} fill="#aebbd6" />
+            </g>
+          </g>
+        ))}
+
         {/* Ghost of the full route, so the arc reads as a plan even before the
             aircraft has flown it. */}
         <path
@@ -194,10 +271,7 @@ export function FlightScene({
             the rotation directly, with no offset to keep in sync. */}
         <g ref={plane}>
           <g transform="translate(-13 -11) scale(1.15)">
-            <path
-              d="M22.5 9.6 L13.4 9.0 L7.2 1.2 L4.6 1.2 L7.6 9.0 L3.4 8.9 L1.5 6.4 L0 6.4 L1.1 9.6 L0 12.8 L1.5 12.8 L3.4 10.3 L7.6 10.2 L4.6 18 L7.2 18 L13.4 10.2 L22.5 9.6 Z"
-              fill="#f2f5ff"
-            />
+            <path d={PLANE} fill="#f2f5ff" />
           </g>
         </g>
       </svg>
