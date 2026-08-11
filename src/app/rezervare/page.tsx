@@ -182,11 +182,16 @@ function Timeline({
 
 function NoQueryState() {
   return (
-    <Reveal>
-      <p className="text-sm text-ink-dim">Rute populare</p>
-      <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <>
+      <Reveal>
+        <p className="text-sm text-ink-dim">Rute populare</p>
+      </Reveal>
+
+      {/* Was a single Reveal around the whole grid — six cards fading in as
+          one lump rather than as six. */}
+      <RevealGroup className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {featuredRoutes.slice(0, 6).map((route) => (
-          <li key={route.slug}>
+          <RevealItem key={route.slug}>
             <Card>
               <Link
                 href={`/rezervare?from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}&seats=1`}
@@ -201,10 +206,10 @@ function NoQueryState() {
                 </span>
               </Link>
             </Card>
-          </li>
+          </RevealItem>
         ))}
-      </ul>
-    </Reveal>
+      </RevealGroup>
+    </>
   );
 }
 
