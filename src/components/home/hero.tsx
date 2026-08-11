@@ -21,6 +21,25 @@ export function Hero() {
     <section className="relative flex min-h-dvh flex-col overflow-hidden pt-24 md:pt-28">
       <Backdrop />
 
+      {/*
+        The coach is a full-bleed layer spanning the whole hero rather than a
+        strip below the type, and that is the single change that makes it read
+        as the subject instead of an ornament.
+
+        The arithmetic is unavoidable: a 900px viewport minus the navbar and
+        the search dock leaves ~712px, and the type stack needs ~400px of it.
+        Reserving a band *below* the type therefore caps the vehicle at ~280px
+        no matter how the camera is tuned — it fills that band already. The
+        only way to a large vehicle is to stop reserving and start overlapping,
+        which is exactly what the automotive sites this is modelled on do: the
+        wordmark crosses the car, it does not sit above it.
+
+        Overlap needs the type to stay readable, so the headline is placed to
+        cross the glazing band — the darkest, most even part of the body — and
+        `HeroScrim` puts a soft pool of shade under the whole type block.
+      */}
+      <HeroScrim />
+
       <div className="container-page relative z-20">
         <div className="flex justify-center">
           <div
@@ -80,14 +99,27 @@ export function Hero() {
         </div>
       </div>
 
-      {/* flex-1 with a modest floor: the band absorbs whatever height is left
-          after the type and dock, so the dock stays above the fold at 900px
-          and the coach simply gets larger on taller screens.
-          The camera fit is bound by this band's *height* on every viewport we
-          ship — the coach is a wide, short subject in a wide, short box — so
-          every pixel added here is a directly larger vehicle. */}
-      <div className="relative z-10 min-h-[200px] flex-1 md:min-h-[250px]">
-        <CoachStage className="absolute inset-0" />
+      {/*
+        The coach lives in this band, but on desktop it *breaks out upward*
+        behind the type instead of being confined to it.
+
+        Two different problems, two different behaviours:
+
+        Desktop — a band gets ~300px after the type and dock have taken their
+        share, and the camera fit fills that band already, so tuning the camera
+        cannot make the vehicle bigger. Only more canvas can. Extending 420px
+        up behind the headline roughly triples the height, and the type crossing
+        the bodywork is the composition the automotive references use anyway.
+
+        Mobile — the dock is a stacked form ~300px tall, so anchoring the canvas
+        to the section's bottom edge buries the whole vehicle behind it. Worse,
+        a full-height layer on a 390px-wide phone is *portrait*, and the fit
+        then needs a camera distance past its clamp, which crops the coach into
+        an unrecognisable slab. Staying inside the band keeps the canvas
+        landscape and the vehicle whole.
+      */}
+      <div className="relative z-0 min-h-[190px] flex-1 md:min-h-[230px]">
+        <CoachStage className="pointer-events-none absolute inset-x-0 bottom-0 top-0 md:top-[-420px]" />
       </div>
 
       <SearchDock />
@@ -119,6 +151,30 @@ function SearchDock() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * A soft pool of shade behind the type block.
+ *
+ * With the vehicle running full-bleed behind the hero, the headline crosses
+ * glossy bodywork that carries moving specular highlights. White type on a
+ * travelling highlight is exactly the case where contrast fails intermittently
+ * — it passes a static check and then breaks for a second every rotation.
+ *
+ * This sits between the canvas and the copy, is heaviest where the type is
+ * densest, and fades out well before the edges so it never reads as a panel.
+ */
+function HeroScrim() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[78%]"
+      style={{
+        background:
+          "radial-gradient(52% 46% at 50% 30%, rgb(3 3 3 / 0.9), rgb(3 3 3 / 0.62) 42%, transparent 74%), linear-gradient(to bottom, rgb(3 3 3 / 0.55), transparent 62%)",
+      }}
+    />
   );
 }
 

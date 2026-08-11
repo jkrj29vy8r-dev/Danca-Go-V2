@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check, Clock, PlaneTakeoff } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { FaqList } from "@/components/faq/faq-browser";
+import { FlightScene } from "@/components/airport/flight-scene";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
-import { Parallax } from "@/components/motion/scroll-effects";
+import { Parallax, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
@@ -100,7 +101,8 @@ export default function AirportTransferPage() {
         scene="ambient"
       />
 
-      <section className="container-page pb-24">
+      <section className="relative container-page pb-24">
+        <SectionAtmosphere align="left" />
         <Reveal>
           <div className="relative aspect-[16/9] overflow-hidden rounded-3xl border border-hairline bg-surface md:aspect-[21/9]">
             <Parallax speed={0.12} className="absolute inset-0 scale-110">
@@ -129,7 +131,22 @@ export default function AirportTransferPage() {
         </Reveal>
       </section>
 
-      <section className="container-page pb-28">
+      {/* The route itself, flown as the reader scrolls. This is the section's
+          one piece of theatre and it earns its place: it says "we take you to
+          the aircraft" without a word of copy, and it costs one inline SVG. */}
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="right" intensity={0.85} />
+        <Reveal>
+          <FlightScene
+            from="Moldova"
+            to="Otopeni"
+            className="aspect-[16/9] w-full sm:aspect-[21/9]"
+          />
+        </Reveal>
+      </section>
+
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="centre" />
         <Reveal>
           <h2 className="text-headline text-gradient">
             <WordsUp>Două feluri de a ajunge la avion.</WordsUp>
@@ -182,7 +199,8 @@ export default function AirportTransferPage() {
         </div>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="left" intensity={0.85} />
         <Reveal>
           <h2 className="text-title text-ink">
             <WordsUp>Curse regulate spre Otopeni</WordsUp>
@@ -244,7 +262,8 @@ export default function AirportTransferPage() {
         </RevealGroup>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="right" />
         <Reveal>
           <h2 className="text-title text-ink">
             <WordsUp>Cum funcționează</WordsUp>
@@ -269,7 +288,8 @@ export default function AirportTransferPage() {
       </section>
 
       {airportFaq && (
-        <section className="container-page pb-8">
+        <section className="relative container-page pb-8">
+        <SectionAtmosphere align="centre" intensity={0.85} />
           <Reveal>
             <h2 className="text-title text-ink">
               <WordsUp>Ce ne întreabă pasagerii</WordsUp>

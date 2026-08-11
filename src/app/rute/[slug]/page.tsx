@@ -16,7 +16,7 @@ import { FaqList } from "@/components/faq/faq-browser";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
-import { ScaleIn } from "@/components/motion/scroll-effects";
+import { ScaleIn, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { faqJsonLd, type FaqItem } from "@/lib/faq";
@@ -204,7 +204,8 @@ export default async function RoutePage({
         </div>
       </PageHeader>
 
-      <section className="container-page pb-24">
+      <section className="relative container-page pb-24">
+        <SectionAtmosphere align="left" />
         <RevealGroup className="grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
@@ -237,7 +238,8 @@ export default async function RoutePage({
         </RevealGroup>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="right" intensity={0.85} />
         <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
           <div>
             <Reveal>
@@ -304,7 +306,8 @@ export default async function RoutePage({
       </section>
 
       {related.length > 0 && (
-        <section className="container-page pb-28">
+        <section className="relative container-page pb-28">
+        <SectionAtmosphere align="centre" />
           <Reveal>
             <h2 className="text-title text-ink">
               <WordsUp>{`Alte plecări spre ${route.to}`}</WordsUp>
@@ -343,7 +346,8 @@ export default async function RoutePage({
         </section>
       )}
 
-      <section className="container-page pb-8">
+      <section className="relative container-page pb-8">
+        <SectionAtmosphere align="left" intensity={0.85} />
         <Reveal>
           <h2 className="text-title text-ink">Întrebări despre această rută</h2>
         </Reveal>

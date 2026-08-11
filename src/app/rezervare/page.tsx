@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { SearchWidget } from "@/components/home/search-widget";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
+import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { searchTrips } from "@/lib/queries";
 import { featuredRoutes, phoneDisplay, site } from "@/lib/site";
@@ -61,7 +62,8 @@ export default async function BookingPage({
         </div>
       </PageHeader>
 
-      <section className="container-page pb-24">
+      <section className="relative container-page pb-24">
+        <SectionAtmosphere align="left" />
         {!hasQuery && <NoQueryState />}
 
         {result?.state === "unconfigured" && <UnconfiguredState />}

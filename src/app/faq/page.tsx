@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { FaqBrowser } from "@/components/faq/faq-browser";
 import { Magnetic, Spotlight } from "@/components/motion/magnetic";
 import { WordsUp } from "@/components/motion/text-reveal";
-import { ScaleIn } from "@/components/motion/scroll-effects";
+import { ScaleIn, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { faqGroups, faqJsonLd } from "@/lib/faq";
 import { phoneDisplay, site } from "@/lib/site";
@@ -35,11 +35,13 @@ export default function FaqPage() {
         lead="Tot ce ne întreabă pasagerii cel mai des, răspuns fără ocolișuri. Dacă nu găsești ce cauți, suntem la un telefon distanță."
       />
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="left" />
         <FaqBrowser groups={faqGroups} />
       </section>
 
-      <section className="container-page pb-8">
+      <section className="relative container-page pb-8">
+        <SectionAtmosphere align="right" intensity={0.85} />
         <ScaleIn>
           <Spotlight className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12" size={560}>
             <div>

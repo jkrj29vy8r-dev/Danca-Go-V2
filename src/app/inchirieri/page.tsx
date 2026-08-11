@@ -5,6 +5,7 @@ import { VehiclePhoto } from "@/components/fleet/vehicle-photo";
 import { Card } from "@/components/ui/card";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
@@ -62,7 +63,8 @@ export default function RentalsPage() {
       </PageHeader>
 
       {/* --- Fleet showcase --- */}
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="left" />
         <Reveal className="max-w-2xl">
           <Eyebrow>Vehicule disponibile</Eyebrow>
           <h2 className="mt-6 text-headline text-gradient">

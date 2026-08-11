@@ -57,8 +57,15 @@ export type CoachSceneProps = {
  * the 3.93m roof, so the shot stared down at the roof panel — the exact
  * failure this comment warns about. 0.06 holds it at ~3.0m, level with the
  * glazing, which is where automotive photography puts it.
+ *
+ * The horizontal bias is deliberately modest. A hard three-quarter angle on a
+ * 12m subject puts the near end at ~10m and the far end at ~22m, and that 2.2×
+ * size ratio foreshortens the body into a wedge — it stops reading as a coach
+ * and starts reading as a truck trailer. Swinging toward the flank compresses
+ * that ratio and shows the two features that carry the vehicle's identity:
+ * the window band and the gold beltline running its full length.
  */
-const DIRECTION = new THREE.Vector3(0.78, 0.06, 0.61).normalize();
+const DIRECTION = new THREE.Vector3(0.58, 0.055, 0.81).normalize();
 
 /**
  * The coach's envelope, as a **cylinder** rather than a box, in metres.
@@ -67,10 +74,22 @@ const DIRECTION = new THREE.Vector3(0.78, 0.06, 0.61).normalize();
  * correct at one heading. The swept envelope of a 12m × 2.55m body rotating
  * about Y is a cylinder of radius √(6² + 1.275²) ≈ 6.13 — that number holds at
  * every angle, which is what makes the fit below stable while the coach spins.
+ *
+ * Measure it from the *extremities*, not the body shell: the front bumper
+ * reaches x = 6.29 and the lamps sit proud of that, so the true swept radius is
+ * √(6.29² + 1.275²) ≈ 6.42. Using the shell's 6.15 under-counted by 5%, which
+ * is small enough to look intentional and wrong enough to slice the nose off
+ * against the right-hand frustum wall.
  */
-const SUBJECT_RADIUS = 6.15;
+const SUBJECT_RADIUS = 6.5;
 /** Half the overall height: ground to the top of the roof cowling is ~4.1m. */
 const SUBJECT_HALF_HEIGHT = 2.1;
+/**
+ * Breathing room. A fit that is exactly tight puts the bodywork on the frame
+ * edge, which reads as a cropping accident rather than a composition — and
+ * leaves nothing for the float and pointer parallax to move into.
+ */
+const FRAME_MARGIN = 1.08;
 /** Vertical centre of that envelope — also where the camera looks. */
 const TARGET = new THREE.Vector3(0, 2.05, 0);
 
@@ -109,7 +128,7 @@ function CameraRig() {
     const distanceForHeight = SUBJECT_RADIUS + SUBJECT_HALF_HEIGHT / tanV;
 
     const distance = THREE.MathUtils.clamp(
-      Math.max(distanceForWidth, distanceForHeight),
+      Math.max(distanceForWidth, distanceForHeight) * FRAME_MARGIN,
       9.5,
       60,
     );
@@ -460,11 +479,13 @@ export default function CoachScene({
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: 1.15,
       }}
-      // Long lens (24° fov) from a three-quarter front angle: compresses the
+      // Long lens (20° fov) from a three-quarter front angle: compresses the
       // body the way automotive photography does, instead of the wide-angle
       // bulge you get from a default 50° camera. CameraRig solves the actual
-      // position from the canvas aspect.
-      camera={{ fov: 24, near: 0.5, far: 160 }}
+      // position from the canvas aspect, so a longer lens simply pushes the
+      // camera further back at the same framing — which is exactly the trade
+      // that flattens the perspective on a subject this long.
+      camera={{ fov: 20, near: 0.5, far: 200 }}
       className={className ?? "!touch-pan-y"}
     >
       <CameraRig />

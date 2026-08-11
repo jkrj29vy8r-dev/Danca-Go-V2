@@ -35,7 +35,13 @@ export function Card({
       className={cn(
         "surface-card group/card overflow-hidden",
         interactive && [
-          "transition-colors duration-500",
+          // Depth on hover, not just a colour change. A card that only tints
+          // reads as a link; one that lifts off the page and casts under
+          // itself reads as an object, which is the whole point of a dark
+          // layered surface.
+          "transition-[color,background-color,border-color,box-shadow,transform] duration-500 ease-[var(--ease-out-expo)]",
+          "hover:-translate-y-1 hover:border-hairline-strong",
+          "hover:shadow-[0_24px_50px_-24px_rgb(0_0_0/0.9),0_0_0_1px_rgb(200_164_104/0.12)]",
           // Highlight layer follows the pointer; fades in on hover only.
           "before:pointer-events-none before:absolute before:inset-0 before:z-10",
           "before:rounded-[inherit] before:opacity-0 before:transition-opacity before:duration-500",

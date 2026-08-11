@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, Spotlight, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
-import { ScaleIn } from "@/components/motion/scroll-effects";
+import { ScaleIn, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { careerBenefits, hiringSteps, openRoles } from "@/lib/careers";
@@ -43,7 +43,8 @@ export default function CareersPage() {
         scene="ambient"
       />
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="left" />
         <RevealGroup className="grid gap-x-12 gap-y-12 sm:grid-cols-2">
           {careerBenefits.map((benefit, index) => (
             <RevealItem key={benefit.title}>
@@ -59,7 +60,8 @@ export default function CareersPage() {
         </RevealGroup>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="right" intensity={0.85} />
         <Reveal>
           <h2 className="text-headline text-gradient">
             <WordsUp>Posturi deschise</WordsUp>
@@ -144,7 +146,8 @@ export default function CareersPage() {
         </div>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="centre" />
         <Reveal>
           <h2 className="text-title text-ink">
             <WordsUp>Cum decurge angajarea</WordsUp>
@@ -168,7 +171,8 @@ export default function CareersPage() {
         </RevealGroup>
       </section>
 
-      <section className="container-page pb-8">
+      <section className="relative container-page pb-8">
+        <SectionAtmosphere align="left" intensity={0.85} />
         <ScaleIn>
           <Spotlight className="surface-card flex flex-col items-start gap-8 overflow-hidden p-8 md:flex-row md:items-center md:justify-between md:p-12" size={560}>
             <div>

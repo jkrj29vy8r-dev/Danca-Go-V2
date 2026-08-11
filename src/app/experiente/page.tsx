@@ -4,6 +4,7 @@ import { RentalForm } from "@/components/rentals/rental-form";
 import { Card } from "@/components/ui/card";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { Magnetic, TiltCard } from "@/components/motion/magnetic";
 import { ClipReveal, WordsUp } from "@/components/motion/text-reveal";
@@ -68,7 +69,8 @@ export default function ExperiencesPage() {
       </PageHeader>
 
       {/* --- Trust signals --- */}
-      <section className="container-page pb-24">
+      <section className="relative container-page pb-24">
+        <SectionAtmosphere align="left" />
         <RevealGroup className="grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline sm:grid-cols-3">
           {[
             { value: String(new Date().getFullYear() - site.founded), suffix: "ani", label: "de experiență pe drum" },

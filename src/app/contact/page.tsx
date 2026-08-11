@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { TiltCard, Spotlight } from "@/components/motion/magnetic";
 import { WordsUp } from "@/components/motion/text-reveal";
-import { ScaleIn } from "@/components/motion/scroll-effects";
+import { ScaleIn, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { openingHours, phoneDisplay, site } from "@/lib/site";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -33,7 +33,8 @@ export default function ContactPage() {
         lead="Fără roboți telefonici și fără formulare care se pierd. Suni, îți răspunde un om care știe orarul pe de rost."
       />
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="left" />
         <RevealGroup className="grid gap-4 md:grid-cols-3">
           {site.phones.map((phone, index) => (
             <RevealItem key={phone}>

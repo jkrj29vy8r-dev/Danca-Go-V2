@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { ReadThrough, WordsUp } from "@/components/motion/text-reveal";
 import { Magnetic } from "@/components/motion/magnetic";
-import { CountUp } from "@/components/motion/scroll-effects";
+import { CountUp, SectionAtmosphere } from "@/components/motion/scroll-effects";
 import { ButtonLink } from "@/components/ui/button";
 import { formatCount, promises, site, stats } from "@/lib/site";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
@@ -34,7 +34,8 @@ export default function AboutPage() {
         scene="ambient"
       />
 
-      <section className="container-page pb-24">
+      <section className="relative container-page pb-24">
+        <SectionAtmosphere align="left" />
         <RevealGroup className="grid gap-px overflow-hidden rounded-3xl border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <RevealItem key={stat.label}>
@@ -58,7 +59,8 @@ export default function AboutPage() {
         </RevealGroup>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="right" intensity={0.85} />
         <div className="grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
           <Reveal>
             <h2 className="text-headline text-gradient">
@@ -88,7 +90,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-page pb-28">
+      <section className="relative container-page pb-28">
+        <SectionAtmosphere align="centre" />
         <Reveal>
           <h2 className="text-title text-ink">
             <WordsUp>Ce garantăm, de fiecare dată</WordsUp>
