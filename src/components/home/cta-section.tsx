@@ -71,7 +71,11 @@ export function CtaSection() {
 
             <a
               href={`tel:${site.phones[0]}`}
-              className="mt-8 inline-flex items-center gap-2 text-sm text-ink-dim transition-colors duration-300 hover:text-ink"
+              // `py-1` with a matching negative margin lifts the touch target
+              // from 18px to 26px — over the 24px minimum — without moving the
+              // baseline. A phone number is one of the most-tapped things on a
+              // transport site's phone layout.
+              className="-my-1 mt-7 inline-flex items-center gap-2 py-1 text-sm text-ink-dim transition-colors duration-300 hover:text-ink"
             >
               <Phone className="size-3.5" aria-hidden />
               <span className="tabular-nums">{phoneDisplay(site.phones[0])}</span>

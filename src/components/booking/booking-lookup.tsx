@@ -132,7 +132,11 @@ export function BookingLookup() {
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               Verifică dacă ai copiat codul exact așa cum apare în email. Dacă tot
               nu merge, sună-ne la{" "}
-              <a href={`tel:${site.phones[0]}`} className="text-accent hover:underline">
+              {/* Padded to clear the 24px minimum touch target. */}
+              <a
+                href={`tel:${site.phones[0]}`}
+                className="-my-1 inline-block py-1 text-accent hover:underline"
+              >
                 {phoneDisplay(site.phones[0])}
               </a>{" "}
               și îl căutăm noi.

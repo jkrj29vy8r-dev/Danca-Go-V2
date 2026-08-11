@@ -183,7 +183,11 @@ export default function ExperiencesPage() {
 
             <p className="mt-10 text-sm text-ink-muted">
               Preferi să vorbim direct?{" "}
-              <a href={`tel:${site.phones[1]}`} className="text-accent hover:underline">
+              {/* Padded to clear the 24px minimum touch target. */}
+              <a
+                href={`tel:${site.phones[1]}`}
+                className="-my-1 inline-block py-1 text-accent hover:underline"
+              >
                 {phoneDisplay(site.phones[1])}
               </a>
             </p>
