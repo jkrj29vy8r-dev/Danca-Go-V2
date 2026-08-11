@@ -119,6 +119,38 @@
   to   { transform: scale(1.045); }
 }
 
+/* A soft band drifting the full width of its (relatively-positioned) parent,
+   continuously. Used on the footer's oversized wordmark, which is wide enough
+   that a self-relative `transform: translateX()` sweep (as the logo uses)
+   would need an impractical travel distance — `left` as a bare percentage
+   resolves against the parent's width instead, so it works at any size.
+   Slow and continuous rather than a paused loop: the source text is already
+   at 2.5% opacity, so even a non-stop sweep only ever reads as a faint pulse
+   of brighter light drifting past, not as a UI loading indicator. */
+@keyframes watermark-drift {
+  from { left: -22%; }
+  to   { left: 122%; }
+}
+
+/* A warm glow that blooms and fades around a number the instant it finishes
+   counting up (see `CountUp`). This is a `text-shadow` pulse rather than the
+   overlay-bar sweep used elsewhere, and that's a hard requirement, not a
+   style choice: every real caller wraps `CountUp` in its own ancestor
+   carrying `.text-gradient` (`background-clip: text; color: transparent`),
+   and giving `CountUp`'s own span `position: relative` — which an
+   absolutely-positioned overlay bar would need as its anchor — makes it a
+   *positioned element*, which paints in a later stacking phase than the
+   ancestor's clipped background. That's the exact bug `WordsUp` had earlier
+   in this project: the glyphs would render, correctly shaped, in the
+   ancestor's declared `color: transparent` and nothing else — invisible.
+   `text-shadow` paints around the glyph outlines independently of the fill
+   colour and needs no `position` change on the element at all, so it can't
+   reopen that bug. */
+@keyframes count-glow {
+  0%, 100% { text-shadow: 0 0 0 rgb(200 164 104 / 0); }
+  35% { text-shadow: 0 0 26px rgb(200 164 104 / 0.85), 0 0 8px rgb(255 255 255 / 0.35); }
+}
+
 /* Radix measures the panel and exposes its height as a custom property, which
    is the only way to ease to `auto` without capping long answers at a guessed
    max-height. */

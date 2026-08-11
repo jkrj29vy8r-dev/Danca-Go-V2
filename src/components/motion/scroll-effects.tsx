@@ -316,6 +316,14 @@ export function CountUp({
         onUpdate: () => {
           node.textContent = format(counter.current);
         },
+        // A warm flash the instant the count lands, so the number reads as
+        // an *arrival* rather than the animation simply running out of frames.
+        // See the `count-glow` comment in globals.css for why this is a
+        // `text-shadow` animation rather than the overlay-bar sweep used for
+        // the logo and the footer watermark.
+        onComplete: () => {
+          node.style.animation = "count-glow 1.1s ease-out";
+        },
         scrollTrigger: { trigger: node, start: "top 88%", once: true },
       });
     });
